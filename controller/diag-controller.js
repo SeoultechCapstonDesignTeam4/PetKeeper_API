@@ -16,11 +16,11 @@ async function eye(req,res){
   const key = 'eye-image/' + `${id}_${Date.now()}`
   const url = 'https://'+process.env.s3_bucket+'.s3.'+process.env.s3_region+'.amazonaws.com/'+key;
   const form = new FormData();
-  form.append('image', fs.createReadStream(image.path));
   try{
     if(!image){ 
       throw new Error('No File');
     }
+    form.append('image', fs.createReadStream(image.path));
     const result = await axios.post(eyeurl, form, {
       headers: form.getHeaders()
     });
