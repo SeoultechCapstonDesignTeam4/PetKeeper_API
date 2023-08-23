@@ -130,7 +130,8 @@ async function logout(req, res) {
 
 async function getUser(req, res) {
   const userInfo = res.locals.userInfo;
-  const { id } = req.params;
+  // const { id } = req.params;
+  const id = userInfo.USER_ID;
 
   try {
     if (userInfo.USER_AUTH === 'admin' || userInfo.USER_ID === id) {
@@ -184,7 +185,7 @@ async function addUser(req, res) {
 async function updateUser(req, res) {
   const userInfo = res.locals.userInfo;
   const user = req.body;
-  const { id } = req.params;
+  const id = userInfo.USER_ID;
 
   try {
     if (!user) {
@@ -212,7 +213,7 @@ async function updateUser(req, res) {
 
 async function deleteUser(req, res) {
   const userInfo = res.locals.userInfo;
-  const { id } = req.params;
+  const id = userInfo.USER_ID;
 
   try {
     if (userInfo.USER_AUTH === 'admin' || userInfo.USER_ID === id) {

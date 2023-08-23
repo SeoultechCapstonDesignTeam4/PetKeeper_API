@@ -1,0 +1,18 @@
+# 빌드 스테이지
+FROM python:3.10.12 as builder
+WORKDIR /app
+# 필요한 라이브러리 설치
+RUN pip install flask pillow torch torchvision
+# Flask 애플리케이션 파일 복사
+COPY app.py /app
+# 모델 파일 및 가중치 파일 복사
+COPY conjunctivitis.pt /app
+
+# 최종 스테이지
+FROM python:3.10.12
+WORKDIR /app
+# 이전 스테이지에서 설치한 라이브러리 및 파일 가져오기
+COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --from=builder /app /app
+EXPOSE 5000
+CMD ["python", "app.py"]

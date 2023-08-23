@@ -1,12 +1,9 @@
 from flask import Flask, jsonify, request
 
 import torch
-# import torch.onnx as onnx
-# import torchvision.models as models
 import torch.nn as nn
 import torchvision.transforms as transforms
 import torch.nn.functional as F
-# import os
 from PIL import Image
 
 app = Flask(__name__)
