@@ -18,8 +18,8 @@ async function getHostpital(req,res){
       NAME: row.BPLCNM,
       ADDRESS: row.RDNWHLADDR,
       PHONE: row.SITETEL,
-      X: eps2097p[0],
-      Y: eps2097p[1],
+      X: eps2097p[1],
+      Y: eps2097p[0],
     };
   });
   return res.status(200).json({
