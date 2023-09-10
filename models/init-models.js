@@ -1,11 +1,15 @@
 var DataTypes = require("sequelize").DataTypes;
+var _p_community = require("./p_community");
 var _p_eye = require("./p_eye");
+var _p_hospital = require("./p_hospital");
 var _p_pet = require("./p_pet");
 var _p_pet_feel = require("./p_pet_feel");
 var _p_user = require("./p_user");
 
 function initModels(sequelize) {
+  var p_community = _p_community(sequelize, DataTypes);
   var p_eye = _p_eye(sequelize, DataTypes);
+  var p_hospital = _p_hospital(sequelize, DataTypes);
   var p_pet = _p_pet(sequelize, DataTypes);
   var p_pet_feel = _p_pet_feel(sequelize, DataTypes);
   var p_user = _p_user(sequelize, DataTypes);
@@ -20,7 +24,9 @@ function initModels(sequelize) {
   p_user.hasMany(p_pet, { as: "p_pets", foreignKey: "USER_ID"});
 
   return {
+    p_community,
     p_eye,
+    p_hospital,
     p_pet,
     p_pet_feel,
     p_user,
