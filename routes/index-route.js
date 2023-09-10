@@ -35,5 +35,6 @@ router.get('/',normalAuth,indexController.index);
 
 router.get('/apiTest',indexController.getTest);
 router.post('/apiTest',indexController.postTest);
+router.get('/hospital',indexController.getHostpital);
 
 module.exports = router;
