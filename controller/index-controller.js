@@ -26,14 +26,19 @@ async function getHostpital(req,res){
       const easting = parseFloat(row.X);
       const northing = parseFloat(row.Y);
       const eps2097p = proj4(eps2097, wgs84, [easting, northing]);
-      return {
-        NAME: row.BPLCNM,
-        ADDRESS: row.RDNWHLADDR,
-        PHONE: row.SITETEL,
-        X: eps2097p[1],
-        Y: eps2097p[0],
-      };
-    });
+      if (row.TRDSTATEGBN === '01'){
+        return {
+          NAME: row.BPLCNM,
+          ADDRESS: row.RDNWHLADDR,
+          PHONE: row.SITETEL,
+          X: eps2097p[1],
+          Y: eps2097p[0],
+        };
+      }else{
+        return null;
+      }
+    }).filter((item) => item !== null);
+
     return res.status(200).json({
       data:extractedData
     })
