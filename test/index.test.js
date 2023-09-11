@@ -1,7 +1,6 @@
 require("dotenv").config({ path: "./env/development.env" });
 const testAdminToken = process.env.testAdminToken;
-const app = process.env.app;
-
+const app = require('../app');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const expect = chai.expect;
@@ -17,13 +16,7 @@ describe('Router Tests', function () {
         .set('Authorization', `Bearer ${testAdminToken}`)
         .end(function (err, res) {
           expect(res).to.have.status(200);
-          //반환되는 json 데이터의 값이 'success'인지 확인
           expect(res.body.message).to.equal('success');
-          // //반환되는 json 데이터의 data의 key값이 title인지 확인
-          // expect(res.body.data).to.have.property('title');
-          // //반환되는 json 데이터의 data의 key값이 name인지 확인
-          // expect(res.body.data).to.have.property('name');
-
           done();
         });
     });
@@ -63,7 +56,6 @@ describe('Router Tests', function () {
       chai.request(app)
         .get(`/hospital?X=${X}&Y=${Y}`)
         .end(function (err, res) {
-          console.log(res.body.data[0]);
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           done();

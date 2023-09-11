@@ -19,8 +19,8 @@ router.delete('/user-img/:id',
   normalAuth,
   userController.deleteUserImg
 );
-router.get('/', normalAuth, userController.getUser);
-router.put('/', normalAuth, userController.updateUser);
-router.delete('/', normalAuth, userController.deleteUser);
+router.get('/:id', normalAuth, userController.getUser);
+router.put('/:id', normalAuth, userController.updateUser);
+router.delete('/:id', normalAuth, userController.deleteUser);
 
 module.exports = router;

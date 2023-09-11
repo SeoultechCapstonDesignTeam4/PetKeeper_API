@@ -1,82 +1,95 @@
 require("dotenv").config({ path: "./env/development.env" });
 const testAdminToken = process.env.testAdminToken;
-const app = process.env.app;
 
+const app = require('../app');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const { getUsers, addUser, updateUser, deleteUser } = require('../service/user-service'); // 적절한 모듈 경로로 변경하세요.
 
 
-
 const expect = chai.expect;
 chai.use(chaiHttp);
+
 describe('User API Tests', function () {
-  // 테스트 전에 데이터 초기화 또는 필요한 설정을 수행할 수 있습니다.
+  // 테스트 전에 데이터 초기화 또는 필요한 설정을 수행할 수 있습
+  let addedUserId;
+  let userEmailDummy = Date.now();
+  let userPhoneDummy = Date.now();
+  let token;
   before(function () {
-    // 여기에 필요한 초기화 코드 추가
+
+  });
+  
+  describe('POST /user', function () {
+    // 사용자 추가 테스트
+    it('should add a new user', async function () {
+      const user = {
+        "USER_EMAIL": userEmailDummy+"@test.com",
+        "USER_PASSWORD": "12341234",
+        "USER_PHONE": userPhoneDummy
+      };
+      const response = await chai.request(app).post('/user/').send(user);
+
+      if (response.status === 200) {
+        // 추가 성공
+        addedUserId = response.body.USER_ID;
+      } else {
+        // 추가 실패, 에러 메시지 출력
+        console.error(response.body.message);
+      }
+      expect(response.status).to.equal(200);
+    });
   });
 
-    // getUsers 함수 테스트
-  describe('GET /user/list',async function () {
-    it('should return an array of users', async function () {
+  describe('POST /user/login', function () {
+    // 로그인 테스트
+    it('should return a token', async function () {
+      const user = {
+        "USER_EMAIL": userEmailDummy+"@test.com",
+        "USER_PASSWORD": "12341234"
+      };
+      const response = await chai.request(app).post('/user/login').send(user);
+      expect(response.status).to.equal(200);
+      if(response.body.token){
+        token = response.body.token;
+      }
+      expect(response.body).to.have.property('token');
+  })
+  });
+
+  // getUsers 함수 테스트
+  describe('GET /user/list',function () {
+    it('should not return an array of users', async function () {
       return chai
         .request(app)
-        .get('/user/list')
-        .set('Authorization', `Bearer ${testAdminToken}`)
+        .get(`/user/list`)
+        .set('Authorization', `Bearer ${token}`)
         .then(response => {
-          expect(response.status).to.equal(200);
-          expect(response.body).to.be.an('array');
+          expect(response.status).to.equal(403);
         });
     });
   });
-
-  // addUser 함수 테스트
-  describe('POST /user', function () {
-    it('should add a new user', async function () {
-      const newUser = {
-          "USER_EMAIL":"test",
-          "USER_PASSWORD":"1234",
-          "USER_PHONE": "010-3345-5322"
-      };
-
-      const response = await chai.request(app).post('/user').send(newUser); // 사용하는 API 경로로 변경하세요.
-      expect(response.status).to.equal(200);
-      expect(response.body).to.have.property('USER_ID');
+  
+  // getUser 함수 테스트
+  describe('GET /user/:id',function () {
+    it('should return an array of user', async function () {
+      return chai
+        .request(app)
+        .get(`/user/${addedUserId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .then(response => {
+          expect(response.status).to.equal(200);
+        });
     });
   });
+  
 
-  // // updateUser 함수 테스트
-  // describe('PUT /users/:id', function () {
-  //   it('should update an existing user', async function () {
-  //     const userId = 1; // 업데이트할 사용자의 ID로 변경하세요.
-  //     const updatedUser = {
-  //       // 여기에 업데이트된 사용자 정보를 제공하세요.
-  //     };
-
-  //     const response = await chai
-  //       .request(app)
-  //       .put(`/users/${userId}`)
-  //       .send(updatedUser); // 사용하는 API 경로로 변경하세요.
-  //     expect(response.status).to.equal(200);
-  //     expect(response.body).to.have.property('USER_ID', userId);
-  //   });
-  // });
-
-  // // deleteUser 함수 테스트
-  // describe('DELETE /users/:id', function () {
-  //   it('should delete an existing user', async function () {
-  //     const userId = 1; // 삭제할 사용자의 ID로 변경하세요.
-
-  //     const response = await chai.request(app).delete(`/users/${userId}`); // 사용하는 API 경로로 변경하세요.
-  //     expect(response.status).to.equal(200);
-  //     expect(response.body).to.have.property('message', 'User deleted');
-  //   });
-  // });
-
-  // 추가 테스트 케이스 추가 가능
-});
-
-// 테스트 후 정리 또는 자원 해제를 수행할 수 있습니다.
-after(function () {
-  // 여기에 필요한 정리 코드 추가
+  describe(`DELETE /user/:id`, function () {
+    it('should delete the added user', async function () {
+      const response = await chai.request(app)
+      .delete(`/user/${addedUserId}`)
+      .set('Authorization', `Bearer ${token}`)
+      expect(response.status).to.equal(200);
+    });
+  });
 });

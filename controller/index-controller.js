@@ -147,10 +147,10 @@ async function getHostpital(req,res){
     const minLatitude = centerLatitude - (deltaLatitude * 180) / Math.PI;
     const maxLatitude = centerLatitude + (deltaLatitude * 180) / Math.PI;
 
-    console.log("최소 경도:", minLongitude);
-    console.log("최대 경도:", maxLongitude);
-    console.log("최소 위도:", minLatitude);
-    console.log("최대 위도:", maxLatitude);
+    // console.log("최소 경도:", minLongitude);
+    // console.log("최대 경도:", maxLongitude);
+    // console.log("최소 위도:", minLatitude);
+    // console.log("최대 위도:", maxLatitude);
     await p_hospital.findAll({
       attributes: ['HOSPITAL_NAME','HOSPITAL_PHONE','HOSPITAL_ADDRESS','HOSPITAL_X','HOSPITAL_Y'],
       where: {
@@ -162,7 +162,7 @@ async function getHostpital(req,res){
         }
       }
     }).then((data) => {
-      console.log(data);
+      // console.log(data);
       return res.status(200).json({
         data: data
       })

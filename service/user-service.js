@@ -145,9 +145,9 @@ async function addUser(user) {
 }
 
 
-async function updateUser(user) {
+async function updateUser(user,id) {
   const checkUser = await p_user.findOne({
-    where: { USER_ID: user.USER_ID }
+    where: { USER_ID: id }
   });
   
   if (!checkUser) {
@@ -157,7 +157,7 @@ async function updateUser(user) {
   const checkEmail = await p_user.findOne({
     where: {
       USER_EMAIL: user.USER_EMAIL,
-      USER_ID: { [Op.not]: user.USER_ID }
+      USER_ID: { [Op.not]: id }
     }
   });
   
@@ -168,7 +168,7 @@ async function updateUser(user) {
   const checkPhone = await p_user.findOne({
     where: {
       USER_PHONE: user.USER_PHONE,
-      USER_ID: { [Op.not]: user.USER_ID }
+      USER_ID: { [Op.not]: id }
     }
   });
   
@@ -177,7 +177,7 @@ async function updateUser(user) {
   }
   
   const [numOfAffectedRows] = await p_user.update(user, {
-    where: { USER_ID: user.USER_ID }
+    where: { USER_ID: id }
   });
   
   if (numOfAffectedRows === 0) {
@@ -195,14 +195,10 @@ async function deleteUser(id) {
     throw new Error('User not found');
   }
   
-  const [numOfAffectedRows] = await p_user.update(
-    { IS_DELETED: true },
-    { where: { USER_ID: id } }
-  );
-  
-  if (numOfAffectedRows === 0) {
-    throw new Error('User not deleted');
-  }
+  const numOfAffectedRows = await p_user.destroy({
+    where: { USER_ID: id },
+  });
+
   
   return numOfAffectedRows;
 }

@@ -20,7 +20,10 @@ async function adminAuth(req,res,next){
       throw new Error('not admin');
     }
   }catch(err){
-    return res.status(403);
+    return res.status(403).json({
+      success: false,
+      message: err.message
+    });
   }
 }
 
@@ -40,13 +43,13 @@ async function normalAuth(req,res,next){
       res.locals.userInfo = user.dataValues;
       return next();
     }else{
-      return res.status(403).json({
-        success: false,
-        message: 'not user'
-      })
+      throw new Error('not even user');
     }
   }catch(err){
-    return res.status(403);
+    return res.status(403).json({
+      success: false,
+      message: err.message
+    });
   }
 }
 module.exports ={

@@ -12,7 +12,7 @@ async function deleteUserImg(req, res) {
   try {
     const user = await userService.getUserById(id);
 
-    if (userInfo.USER_AUTH === 'admin' || user.USER_ID === userInfo.USER_ID) {
+    if (userInfo.USER_AUTH == 'admin' || user.USER_ID == userInfo.USER_ID) {
       const target = user.USER_IMAGE.split('/')[3] + '/' + user.USER_IMAGE.split('/')[4];
 
       if (target !== 'user-profile/default-img') {
@@ -53,7 +53,7 @@ async function uploadUserImg(req, res) {
   try {
     const user = await userService.getUserById(id);
 
-    if (userInfo.USER_AUTH === 'admin' || user.USER_ID === userInfo.USER_ID) {
+    if (userInfo.USER_AUTH == 'admin' || user.USER_ID == userInfo.USER_ID) {
       if (user.USER_IMAGE !== null) {
         const target = user.USER_IMAGE.split('/')[3] + '/' + user.USER_IMAGE.split('/')[4];
         await deleteImg(target);
@@ -130,11 +130,9 @@ async function logout(req, res) {
 
 async function getUser(req, res) {
   const userInfo = res.locals.userInfo;
-  // const { id } = req.params;
-  const id = userInfo.USER_ID;
-
+  const { id } = req.params;
   try {
-    if (userInfo.USER_AUTH === 'admin' || userInfo.USER_ID === id) {
+    if (userInfo.USER_AUTH == 'admin' || userInfo.USER_ID == id) {
       const data = await userService.getUserById(id);
       return res.status(200).json(data).end();
     } else {
@@ -185,7 +183,7 @@ async function addUser(req, res) {
 async function updateUser(req, res) {
   const userInfo = res.locals.userInfo;
   const user = req.body;
-  const id = userInfo.USER_ID;
+  const {id} = req.params;
 
   try {
     if (!user) {
@@ -194,11 +192,9 @@ async function updateUser(req, res) {
       throw new Error('Phone, email, or password is empty');
     }
 
-    if (userInfo.USER_AUTH === 'admin' || userInfo.USER_ID === id) {
-      user.USER_ID = id;
+    if (userInfo.USER_AUTH == 'admin' || userInfo.USER_ID == id) {
       user.USER_PASSWORD = bcrypt.hashSync(user.USER_PASSWORD, 10);
-
-      const data = await userService.updateUser(user);
+      const data = await userService.updateUser(user,id);
       return res.status(200).json(data).end();
     } else {
       throw new Error('Permission denied');
@@ -213,16 +209,17 @@ async function updateUser(req, res) {
 
 async function deleteUser(req, res) {
   const userInfo = res.locals.userInfo;
-  const id = userInfo.USER_ID;
-
+  const userId = userInfo.USER_ID;
+  const { id } = req.params;
   try {
-    if (userInfo.USER_AUTH === 'admin' || userInfo.USER_ID === id) {
+    if (userInfo.USER_AUTH == 'admin' || userInfo.USER_ID == id) {
       const data = await userService.deleteUser(id);
       return res.status(200).json(data).end();
     } else {
       throw new Error('Permission denied');
     }
   } catch (err) {
+    console.log(err.message)
     return res.status(403).json({
       success: false,
       message: err.message
