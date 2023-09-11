@@ -34,10 +34,19 @@ async function updateHostpital(req,res){
       const easting = parseFloat(row.X);
       const northing = parseFloat(row.Y);
       const eps2097p = proj4(eps2097, wgs84, [easting, northing]);
+      let tel = row.SITETEL.split('-');
+      if (tel.length == 3){
+        tel = `${tel[0]}-${tel[1]}-${tel[2]}`;
+      }else if(tel.length == 2){
+        tel = `02-${tel[0]}-${tel[1]}`;
+      }else{
+        tel = '';
+      }
+      console.log(tel)
       if (row.TRDSTATEGBN === '01'){
         await p_hospital.create({
           HOSPITAL_NAME: row.BPLCNM,
-          HOSPITAL_PHONE: row.SITETEL,
+          HOSPITAL_PHONE: tel,
           HOSPITAL_ADDRESS: row.RDNWHLADDR,
           HOSPITAL_X: parseFloat(eps2097p[1].toFixed(6)), // X 좌표를 소수점 아래 6자리로 제한
           HOSPITAL_Y: parseFloat(eps2097p[0].toFixed(6)), // Y 좌표를 소수점 아래 6자리로 제한          
@@ -168,7 +177,9 @@ async function getHostpital(req,res){
 
 
 function index(req, res, next) {
-  res.render('index', { title: 'Capstone4Team', name: 'PetKeeper' })
+  res.json({
+    message: 'success'
+  });
 }
 
 async function getTest(req,res){

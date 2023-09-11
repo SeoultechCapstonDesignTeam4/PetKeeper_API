@@ -14,6 +14,7 @@
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
+    "chai-http": "^4.4.0",
     "child-process": "^1.0.2",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
@@ -33,5 +34,9 @@
     "proj4": "^2.9.0",
     "sequelize": "^6.30.0",
     "sharp": "^0.32.1"
+  },
+  "devDependencies": {
+    "chai": "^4.3.8",
+    "mocha": "^10.2.0"
   }
 }
