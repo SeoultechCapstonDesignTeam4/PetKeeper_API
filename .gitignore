@@ -4,3 +4,6 @@ dist/
 .idea
 # **/env/*
 env/development.env
+coverage/*
+.nyc_output/*
+

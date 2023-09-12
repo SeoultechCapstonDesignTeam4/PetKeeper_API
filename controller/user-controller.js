@@ -195,6 +195,7 @@ async function updateUser(req, res) {
     if (userInfo.USER_AUTH == 'admin' || userInfo.USER_ID == id) {
       user.USER_PASSWORD = bcrypt.hashSync(user.USER_PASSWORD, 10);
       const data = await userService.updateUser(user,id);
+      data.USER_PASSWORD = '********';
       return res.status(200).json(data).end();
     } else {
       throw new Error('Permission denied');

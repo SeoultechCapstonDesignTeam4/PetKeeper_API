@@ -58,22 +58,10 @@ describe('Router Tests', function () {
         .end(function (err, res) {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
+          console.log(res.body.data[0]);
           done();
         });
+        
     });
   });
-
-  // adminAuth가 필요한 경우 테스트 (주석 해제 후 사용)
-  // describe('GET /hospitalUpdate', function () {
-  //   it('should return a JSON response with admin authentication', function (done) {
-  //     chai.request(app)
-  //       .get('/hospitalUpdate')
-  //       .set('Authorization', 'Bearer YOUR_ADMIN_TOKEN')
-  //       .end(function (err, res) {
-  //         expect(res).to.have.status(200);
-  //         expect(res).to.be.json;
-  //         done();
-  //       });
-  //   });
-  // });
 });

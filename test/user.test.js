@@ -82,6 +82,22 @@ describe('User API Tests', function () {
         });
     });
   });
+
+  describe('PUT /user/:id',function () {
+    it('should update the added user', async function () {
+      const user = {
+        "USER_EMAIL": userEmailDummy+"@test.com",
+        "USER_PASSWORD": "12341234",
+        "USER_PHONE": userPhoneDummy
+      };
+      const response = await chai.request(app)
+      .put(`/user/${addedUserId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(user);
+      console.log(response.body);
+      expect(response.status).to.equal(200);
+    });
+  });
   
 
   describe(`DELETE /user/:id`, function () {
