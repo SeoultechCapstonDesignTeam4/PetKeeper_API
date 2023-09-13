@@ -24,16 +24,20 @@ async function getUsers() {
 
 async function deleteUserImg(USER_ID) {
   const defaultImg = `https://${process.env.s3_bucket}.s3.${process.env.s3_region}.amazonaws.com/user-profile/default-img`;
+  const check = await p_user.findOne({ where: { USER_ID: USER_ID } });
+  if (!check) {
+    throw new Error('User not found');
+  }
   const [numOfAffectedRows] = await p_user.update(
     { USER_IMAGE: defaultImg },
     { where: { USER_ID: USER_ID } }
   );
   
-  if (numOfAffectedRows === 0) {
-    throw new Error('User not found');
-  }
+  // if (numOfAffectedRows === 0) {
+  //   throw new Error('User Image Not Deleted');
+  // }
   
-  return numOfAffectedRows;
+  return defaultImg;
 }
 
 async function uploadUserImg(USER_ID, key) {
@@ -46,7 +50,7 @@ async function uploadUserImg(USER_ID, key) {
     throw new Error('User not found');
   }
   
-  return numOfAffectedRows;
+  return key;
 }
 
 async function getUserById(id) {
@@ -176,11 +180,11 @@ async function updateUser(user,id) {
     throw new Error('Phone already exists');
   }
   
-  const [numOfAffectedRows] = await p_user.update(user, {
+  const updatedUser = await p_user.update(user, {
     where: { USER_ID: id }
   });
   
-  if (numOfAffectedRows === 0) {
+  if (!updatedUser) {
     throw new Error('User not updated');
   }
   

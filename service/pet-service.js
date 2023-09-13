@@ -14,7 +14,10 @@ async function getPets() {
 
 async function deletePetImg(PET_ID) {
   const defaultImg = `https://${process.env.s3_bucket}.s3.${process.env.s3_region}.amazonaws.com/pet-profile/default-img`;
-  
+  const check = await p_pet.findOne({ where: { PET_ID: PET_ID } });
+  if (!check) {
+    throw new Error('Pet not found');
+  }
   const [numOfAffectedRows] = await p_pet.update(
     { PET_IMAGE: defaultImg },
     { where: { PET_ID: PET_ID } }
@@ -28,6 +31,11 @@ async function deletePetImg(PET_ID) {
 }
 
 async function uploadPetImg(PET_ID, key) {
+  const check = await p_pet.findOne({ where: { PET_ID: PET_ID } });
+  if (!check) {
+    throw new Error('Pet not found');
+  }
+
   const [numOfAffectedRows] = await p_pet.update(
     { PET_IMAGE: key },
     { where: { PET_ID: PET_ID } }
@@ -70,24 +78,34 @@ async function addPet(pet) {
   return createdPet;
 }
 
-async function updatePet(pet) {
+async function updatePet(pet,id) {
+  const check = await p_pet.findOne({ where: { PET_ID: id } });
+  if (!check) {
+    throw new Error('Pet not found');
+  }
+
   const [numOfAffectedRows] = await p_pet.update(
     pet,
-    { where: { PET_ID: pet.PET_ID } }
+    { where: { PET_ID: id } }
   );
   
   if (numOfAffectedRows === 0) {
     throw new Error('Pet not updated');
   }
-  
-  return numOfAffectedRows;
+  return pet;
 }
 
 async function deletePet(id) {
-  const [numOfAffectedRows] = await p_pet.update(
-    { IS_DELETED: true },
-    { where: { PET_ID: id } }
-  );
+  // const [numOfAffectedRows] = await p_pet.update(
+  //   { IS_DELETED: true },
+  //   { where: { PET_ID: id } }
+  // );
+  const check = await p_pet.findOne({ where: { PET_ID: id } });
+  if (!check) {
+    throw new Error('Pet not found');
+  }
+
+  const numOfAffectedRows = await p_pet.destroy({ where: { PET_ID: id } });
   
   if (numOfAffectedRows === 0) {
     throw new Error('Pet not deleted');

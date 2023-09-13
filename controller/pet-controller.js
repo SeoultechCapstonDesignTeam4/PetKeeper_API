@@ -101,14 +101,13 @@ async function updatePet(req,res){
   const userInfo = res.locals.userInfo;
   let {pet} = req.body;
   const {id} = req.params;
-  pet.PET_ID = id;
   try{
     if(!pet){
       throw new Error('No pet');
     }
     const petInfo = await petService.getPetById(id);
     if(userInfo.USER_AUTH === 'admin' || petInfo.USER_ID ===userInfo.USER_ID){
-      const data = await petService.updatePet(pet);
+      const data = await petService.updatePet(pet,id);
       return res.status(200).json(pet).end();
     }else{
       throw new Error('permission denied');
