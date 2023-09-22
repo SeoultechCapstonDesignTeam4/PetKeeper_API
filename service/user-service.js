@@ -1,6 +1,6 @@
 const sequelize = require('../models').sequelize;
 let initModels = require('../models/init-models');
-let {p_pet,p_user} = initModels(sequelize);
+let {p_pet,p_user,p_pet_vaccination,p_pet_weight} = initModels(sequelize);
 const { Op } = require('sequelize');
 async function getUsers() {
   const users = await p_user.findAll({
@@ -11,6 +11,15 @@ async function getUsers() {
       model: p_pet,
       as: 'p_pets',
       where: { IS_DELETED: 0 },
+      include:[
+        {
+          model: p_pet_vaccination,
+          as: 'p_pet_vaccinations',
+        },{
+          model: p_pet_weight,
+          as: 'p_pet_weights',
+        }
+      ],
       attributes: { exclude: ['createdAt', 'updatedAt', 'IS_DELETED'] }
     }
   });
@@ -62,8 +71,18 @@ async function getUserById(id) {
     include: {
       model: p_pet,
       as: 'p_pets',
-      attributes: { exclude: ['createdAt', 'updatedAt', 'IS_DELETED'] },
-    },
+      where: { IS_DELETED: 0 },
+      include:[
+        {
+          model: p_pet_vaccination,
+          as: 'p_pet_vaccinations',
+        },{
+          model: p_pet_weight,
+          as: 'p_pet_weights',
+        }
+      ],
+      attributes: { exclude: ['createdAt', 'updatedAt', 'IS_DELETED'] }
+    }
   });
   
   if (!user) {
@@ -78,7 +97,22 @@ async function getUserByEmail(email) {
     attributes: {
       exclude: ['IS_DELETED', 'createdAt', 'updatedAt']
     },
-    where: { USER_EMAIL: email }
+    where: { USER_EMAIL: email },
+    include: {
+      model: p_pet,
+      as: 'p_pets',
+      where: { IS_DELETED: 0 },
+      include:[
+        {
+          model: p_pet_vaccination,
+          as: 'p_pet_vaccinations',
+        },{
+          model: p_pet_weight,
+          as: 'p_pet_weights',
+        }
+      ],
+      attributes: { exclude: ['createdAt', 'updatedAt', 'IS_DELETED'] }
+    }
   });
   
   if (!user) {
@@ -92,6 +126,21 @@ async function getUserByPhone(phone) {
   const user = await p_user.findOne({
     attributes: {
       exclude: ['USER_PASSWORD', 'USER_ACCESSTOKEN', 'IS_DELETED', 'createdAt', 'updatedAt']
+    },
+    include: {
+      model: p_pet,
+      as: 'p_pets',
+      where: { IS_DELETED: 0 },
+      include:[
+        {
+          model: p_pet_vaccination,
+          as: 'p_pet_vaccinations',
+        },{
+          model: p_pet_weight,
+          as: 'p_pet_weights',
+        }
+      ],
+      attributes: { exclude: ['createdAt', 'updatedAt', 'IS_DELETED'] }
     },
     where: { USER_PHONE: phone }
   });

@@ -1,9 +1,22 @@
 const sequelize = require('../models').sequelize;
 let initModels = require('../models/init-models');
-let {p_pet,p_user} = initModels(sequelize);
+let {p_pet,p_user,p_pet_vaccination,p_pet_weight} = initModels(sequelize);
 
 async function getPets() {
-  const pets = await p_pet.findAll();
+  const pets = await p_pet.findAll({
+    include: [
+      {
+        model: p_user,
+        as: 'USER',
+      },{
+        model: p_pet_vaccination,
+        as: 'p_pet_vaccinations',
+      },{
+        model: p_pet_weight,
+        as: 'p_pet_weights',
+      }
+    ]
+  });
   
   if (!pets.length) {
     throw new Error('Pets not found');
@@ -49,7 +62,19 @@ async function uploadPetImg(PET_ID, key) {
 }
 
 async function getPetById(id) {
-  const pet = await p_pet.findOne({ where: { PET_ID: id } });
+  const pet = await p_pet.findOne({ 
+    include: [
+      {
+        model: p_user,
+        as: 'USER',
+      },{
+        model: p_pet_vaccination,
+        as: 'p_pet_vaccinations',
+      },{
+        model: p_pet_weight,
+        as: 'p_pet_weights',
+      }
+    ],where: { PET_ID: id } });
   
   if (!pet) {
     throw new Error('Pet not found');
@@ -59,7 +84,19 @@ async function getPetById(id) {
 }
 
 async function getPetByUserId(USER_ID) {
-  const pets = await p_pet.findAll({ where: { USER_ID: USER_ID } });
+  const pets = await p_pet.findAll({ 
+    include: [
+      {
+        model: p_user,
+        as: 'USER',
+      },{
+        model: p_pet_vaccination,
+        as: 'p_pet_vaccinations',
+      },{
+        model: p_pet_weight,
+        as: 'p_pet_weights',
+      }
+    ],where: { USER_ID: USER_ID } });
   
   if (!pets.length) {
     throw new Error('Pet not found');
@@ -114,6 +151,69 @@ async function deletePet(id) {
   return numOfAffectedRows;
 }
 
+async function addPetVaccination(info){
+  const createdVaccination = await p_pet_vaccination.create(info);
+  if (!createdVaccination) {
+    throw new Error('Pet_Vaccination not created');
+  }
+  return createdPet;
+}
+
+async function updatePetVaccination(info,id){
+  const petValidate = await p_pet.findOne({ where: { PET_ID: id } });
+  if (!petValidate) {
+    throw new Error('Pet not found');
+  }
+  const updatedVaccination = await p_pet_vaccination.update(pet, { where: { PET_ID: id } });
+  if (!updatedVaccination) {
+    throw new Error('Pet_Vaccination not updated');
+  }
+  return info;
+}
+
+async function deletePetVaccination(id){
+  const petValidate = await p_pet.findOne({ where: { PET_ID: id } });
+  if (!petValidate) {
+    throw new Error('Pet not found');
+  }
+  const deletedVaccination = await p_pet_vaccination.destroy({ where: { PET_VACCINATION_ID: id } });
+  if (!deletedVaccination) {
+    throw new Error('Pet_Vaccination not deleted');
+  }
+  return deletedVaccination;
+}
+
+async function addPetWeight(info){
+  const createdWeight = await p_pet_weight.create(info);
+  if (!createdWeight) {
+    throw new Error('Pet_WEIGHT not created');
+  }
+  return createdWeight;
+}
+async function updatePetWeight(info,id){
+  const petValidate = await p_pet.findOne({ where: { PET_ID: id } });
+  if (!petValidate) {
+    throw new Error('Pet not found');
+  }
+  const updatedWeight = await p_pet_weight.update(info, { where: { PET_WEIGHT_ID: id } });
+  if (!updatedWeight) {
+    throw new Error('Pet_WEIGHT not updated');
+  }
+  return info;
+}
+
+async function deletePetWeight(id){
+  const petValidate = await p_pet.findOne({ where: { PET_ID: id } });
+  if (!petValidate) {
+    throw new Error('Pet not found');
+  }
+  const deletedWeight = await p_pet_weight.destroy({ where: { PET_WEIGHT_ID: id } });
+  if (!deletedWeight) {
+    throw new Error('Pet_WEIGHT not deleted');
+  }
+  return deletedWeight;
+}
+
 
 module.exports ={
   getPets,
@@ -123,5 +223,13 @@ module.exports ={
   updatePet,
   deletePet,
   deletePetImg,
-  uploadPetImg
+  uploadPetImg,
+
+  addPetVaccination,
+  updatePetVaccination,
+  deletePetVaccination,
+
+  addPetWeight,
+  updatePetWeight,
+  deletePetWeight
 }

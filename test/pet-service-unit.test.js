@@ -31,7 +31,7 @@ describe('Pet Service Unit Tests', function () {
 
   describe('getPetById', function () {
     it('should return a pet by ID', async function () {
-      const pet = await petService.getPetById(1);
+      const pet = await petService.getPetById(1); 
       expect(pet).to.be.an('object');
       expect(pet.PET_ID).to.equal(1);
     });

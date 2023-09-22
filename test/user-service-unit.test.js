@@ -133,7 +133,7 @@ describe('User Service Unit Tests', function () {
     it('should throw an error if email already exists for another user', async function () {
       const user = {
         USER_EMAIL: 'test', // 이미 존재하는 이메일을 사용하세요
-        USER_PHONE: '000-0000-0000',
+        USER_PHONE: '100-0000-0000',
       };
       // 다른 사용자의 이메일을 변경하려는 경우에 대한 예외 상황을 테스트합니다.
       await expect(userService.updateUser(user, dummyUser.USER_ID)).to.be.rejectedWith('Email already exists');

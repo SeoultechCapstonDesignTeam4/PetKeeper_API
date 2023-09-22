@@ -3,6 +3,8 @@ var _p_eye = require("./p_eye");
 var _p_hospital = require("./p_hospital");
 var _p_pet = require("./p_pet");
 var _p_pet_feel = require("./p_pet_feel");
+var _p_pet_vaccination = require("./p_pet_vaccination");
+var _p_pet_weight = require("./p_pet_weight");
 var _p_post = require("./p_post");
 var _p_post_comment = require("./p_post_comment");
 var _p_post_like = require("./p_post_like");
@@ -14,6 +16,8 @@ function initModels(sequelize) {
   var p_hospital = _p_hospital(sequelize, DataTypes);
   var p_pet = _p_pet(sequelize, DataTypes);
   var p_pet_feel = _p_pet_feel(sequelize, DataTypes);
+  var p_pet_vaccination = _p_pet_vaccination(sequelize, DataTypes);
+  var p_pet_weight = _p_pet_weight(sequelize, DataTypes);
   var p_post = _p_post(sequelize, DataTypes);
   var p_post_comment = _p_post_comment(sequelize, DataTypes);
   var p_post_like = _p_post_like(sequelize, DataTypes);
@@ -24,6 +28,10 @@ function initModels(sequelize) {
   p_pet.hasMany(p_eye, { as: "p_eyes", foreignKey: "PET_ID"});
   p_pet_feel.belongsTo(p_pet, { as: "PET", foreignKey: "PET_ID"});
   p_pet.hasMany(p_pet_feel, { as: "p_pet_feels", foreignKey: "PET_ID"});
+  p_pet_vaccination.belongsTo(p_pet, { as: "PET", foreignKey: "PET_ID"});
+  p_pet.hasMany(p_pet_vaccination, { as: "p_pet_vaccinations", foreignKey: "PET_ID"});
+  p_pet_weight.belongsTo(p_pet, { as: "PET", foreignKey: "PET_ID"});
+  p_pet.hasMany(p_pet_weight, { as: "p_pet_weights", foreignKey: "PET_ID"});
   p_post_comment.belongsTo(p_post, { as: "POST", foreignKey: "POST_ID"});
   p_post.hasMany(p_post_comment, { as: "p_post_comments", foreignKey: "POST_ID"});
   p_post_like.belongsTo(p_post, { as: "POST", foreignKey: "POST_ID"});
@@ -48,6 +56,8 @@ function initModels(sequelize) {
     p_hospital,
     p_pet,
     p_pet_feel,
+    p_pet_vaccination,
+    p_pet_weight,
     p_post,
     p_post_comment,
     p_post_like,

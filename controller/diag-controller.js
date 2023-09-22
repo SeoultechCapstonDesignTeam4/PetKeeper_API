@@ -38,7 +38,11 @@ async function eye(req,res){
     } else {
       throw new Error('No File');
     }
-    return res.status(200).json(response);
+    if(response.result == 'Success'){
+      return res.status(200).json(response);  
+    }else{
+      return res.status(403).json(response);
+    }
   }catch(err){
     return res.status(403).json({
       success: false,
