@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('p_pet_vaccination', {
-    'PET_ VACCINATION_ID': {
+    PET_VACCINATION_ID: {
       autoIncrement: true,
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
@@ -15,14 +15,17 @@ module.exports = function(sequelize, DataTypes) {
         key: 'PET_ID'
       }
     },
-    PET_VACCINATION_TEXT: {
+    PET_VACCINATION_NAME: {
       type: DataTypes.CHAR(40),
       allowNull: true
     },
     PET_VACCINATION_DATE: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+    PET_VACCINATION_PERIOD: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     sequelize,
@@ -34,7 +37,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "PET_ VACCINATION_ID" },
+          { name: "PET_VACCINATION_ID" },
         ]
       },
       {

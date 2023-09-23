@@ -41,7 +41,7 @@ let petImg = require('./middle/aws-s3').imageReq('pet-profile');
     }
 ]
  */
-router.get('/', adminAuth, petController.getPets);
+router.get('/list', adminAuth, petController.getPets);
 /**
  * @api {post} /pet Add Pet
  * @apiName addPet
@@ -162,5 +162,6 @@ router.put('/:id', normalAuth, petController.updatePet);
  * }
  */
 router.delete('/:id', normalAuth, petController.deletePet);
-
+router.post('/vaccination/:id', normalAuth, petController.addPetVaccination);
+router.delete('/vaccination/:id', normalAuth, petController.deletePetVaccination);
 module.exports = router;

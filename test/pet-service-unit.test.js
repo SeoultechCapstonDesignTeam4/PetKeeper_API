@@ -31,7 +31,8 @@ describe('Pet Service Unit Tests', function () {
 
   describe('getPetById', function () {
     it('should return a pet by ID', async function () {
-      const pet = await petService.getPetById(1); 
+      const pet = await petService.getPetById(1);
+      console.log(pet)
       expect(pet).to.be.an('object');
       expect(pet.PET_ID).to.equal(1);
     });
@@ -209,5 +210,182 @@ describe('Pet Service Unit Tests', function () {
         expect(deletedRows).to.equal(1);
       }
     })
+  });
+});
+
+describe('펫 백신 단위테스트', function () {
+
+  describe('펫 백신 추가', function () {
+    let addedPetVaccinationId;
+    it('백신 추가', async function () {
+      let pet_id = 1;
+      const petVaccination = {
+        PET_VACCINATION_NAME: '코로나',
+        PET_VACCINATION_DATE: '2021-01-01',
+        PET_VACCINATION_PERIOD: 365,
+      };
+      const addedPetVaccination = await petService.addPetVaccination(petVaccination,pet_id);
+      expect(addedPetVaccination).to.be.an('object');
+      expect(addedPetVaccination.PET_VACCINATION_NAME).to.equal('코로나');
+      expect(addedPetVaccination.PET_VACCINATION_DATE).to.equal('2021-01-01');
+      expect(addedPetVaccination.PET_VACCINATION_PERIOD).to.equal(365);
+      addedPetVaccinationId = addedPetVaccination.PET_VACCINATION_ID;
+    });
+    after(async function () {
+      const deletedRows = await petService.deletePetVaccination(addedPetVaccinationId);
+      expect(deletedRows).to.equal(1);
+    });
+  });
+  
+  describe('펫 백신 수정', function () {
+    let addedPetVaccinationId;
+    before(async function () {
+      let pet_id = 1;
+      const petVaccination = {
+        PET_VACCINATION_NAME: '코로나',
+        PET_VACCINATION_DATE: '2021-01-01',
+        PET_VACCINATION_PERIOD: 365,
+      };
+      const addedPetVaccination = await petService.addPetVaccination(petVaccination,pet_id);
+      expect(addedPetVaccination).to.be.an('object');
+      expect(addedPetVaccination.PET_VACCINATION_NAME).to.equal('코로나');
+      expect(addedPetVaccination.PET_VACCINATION_DATE).to.equal('2021-01-01');
+      expect(addedPetVaccination.PET_VACCINATION_PERIOD).to.equal(365);
+      addedPetVaccinationId = addedPetVaccination.PET_VACCINATION_ID;
+      console.log(addedPetVaccinationId)
+    })
+    it('백신 수정', async function () {
+      const petVaccination = {
+        PET_VACCINATION_NAME: '독감',
+        PET_VACCINATION_DATE: '2021-01-02',
+        PET_VACCINATION_PERIOD: 10,
+      };
+      const updatedPetVaccination = await petService.updatePetVaccination(petVaccination,addedPetVaccinationId);
+      expect(updatedPetVaccination).to.be.an('object');
+      expect(updatedPetVaccination.PET_VACCINATION_NAME).to.equal('독감');
+      expect(updatedPetVaccination.PET_VACCINATION_DATE).to.equal('2021-01-02');
+      expect(updatedPetVaccination.PET_VACCINATION_PERIOD).to.equal(10);
+    });
+    after(async function () {
+      const deletedRows = await petService.deletePetVaccination(addedPetVaccinationId);
+      expect(deletedRows).to.equal(1);
+    });
+  });
+
+  describe('펫 백신 삭제', function () {
+    let addedPetVaccinationId;
+    before(async function () {
+      let pet_id = 1;
+      const petVaccination = {
+        PET_VACCINATION_NAME: '코로나',
+        PET_VACCINATION_DATE: '2021-01-01',
+        PET_VACCINATION_PERIOD: 365,
+      };
+      const addedPetVaccination = await petService.addPetVaccination(petVaccination,pet_id);
+      expect(addedPetVaccination).to.be.an('object');
+      expect(addedPetVaccination.PET_VACCINATION_NAME).to.equal('코로나');
+      expect(addedPetVaccination.PET_VACCINATION_DATE).to.equal('2021-01-01');
+      expect(addedPetVaccination.PET_VACCINATION_PERIOD).to.equal(365);
+      addedPetVaccinationId = addedPetVaccination.PET_VACCINATION_ID;
+    })
+    it('백신 삭제', async function () {
+      const deletedRows = await petService.deletePetVaccination(addedPetVaccinationId);
+      expect(deletedRows).to.equal(1);
+    });
+  });
+  describe('펫 백신 조회', function () {
+    it('백신 전체 조회', async function () {
+      const petVaccinations = await petService.getPetVaccinations(1);
+      expect(petVaccinations).to.be.an('array');
+    });
+    it('백신 날짜 조회', async function () {
+      const petVaccination = await petService.getPetVaccinationByDate(1,'2024-02-15');
+      expect(petVaccination).to.be.an('array');
+    });
+  });
+});
+
+describe('펫 체중 단위테스트', function () {
+  describe('펫 체중 추가', function () {
+    let addedPetWeightId;
+    let pet_id = 1;
+    const petWeight ={
+      PET_WEIGHT: 10.5,
+      PET_WEIGHT_DATE: '2021-01-01',
+    }
+    it('체중 추가', async function () {
+      const addedPetWeight = await petService.addPetWeight(petWeight,pet_id);
+      expect(addedPetWeight).to.be.an('object');
+      expect(addedPetWeight.PET_WEIGHT).to.equal(10.5);
+      expect(addedPetWeight.PET_WEIGHT_DATE).to.equal('2021-01-01');
+      addedPetWeightId = addedPetWeight.PET_WEIGHT_ID;
+    });
+    after(async function () {
+      const deletedRows = await petService.deletePetWeight(addedPetWeightId);
+      expect(deletedRows).to.equal(1);
+    });
+  });
+
+  describe('펫 체중 수정', function () {
+    let addedPetWeightId;
+    let pet_id = 1;
+    before(async function () {
+      const petWeight ={
+        PET_WEIGHT: 10.5,
+        PET_WEIGHT_DATE: '2021-01-01',
+      }
+      const addedPetWeight = await petService.addPetWeight(petWeight,pet_id);
+      expect(addedPetWeight).to.be.an('object');
+      expect(addedPetWeight.PET_WEIGHT).to.equal(10.5);
+      expect(addedPetWeight.PET_WEIGHT_DATE).to.equal('2021-01-01');
+      addedPetWeightId = addedPetWeight.PET_WEIGHT_ID;
+    })
+    it('체중 수정', async function () {
+      const petWeight ={
+        PET_WEIGHT: 3.3,
+        PET_WEIGHT_DATE: '2020-01-01',
+      }
+      const updatedPetWeight = await petService.updatePetWeight(petWeight,addedPetWeightId);
+      expect(updatedPetWeight).to.be.an('object');
+      expect(updatedPetWeight.PET_WEIGHT).to.equal(3.3);
+      expect(updatedPetWeight.PET_WEIGHT_DATE).to.equal('2020-01-01');
+    });
+    after(async function () {
+      const deletedRows = await petService.deletePetWeight(addedPetWeightId);
+      expect(deletedRows).to.equal(1);
+    });
+  });
+
+  describe('펫 체중 삭제', function () {
+    let addedPetWeightId;
+    let pet_id = 1;
+    before(async function () {
+      const petWeight ={
+        PET_WEIGHT: 10.5,
+        PET_WEIGHT_DATE: '2021-01-01',
+      }
+      const addedPetWeight = await petService.addPetWeight(petWeight,pet_id);
+      expect(addedPetWeight).to.be.an('object');
+      expect(addedPetWeight.PET_WEIGHT).to.equal(10.5);
+      expect(addedPetWeight.PET_WEIGHT_DATE).to.equal('2021-01-01');
+      addedPetWeightId = addedPetWeight.PET_WEIGHT_ID;
+    })
+    it('체중 삭제', async function () {
+      const deletedRows = await petService.deletePetWeight(addedPetWeightId);
+      expect(deletedRows).to.equal(1);
+    });
+  });
+
+  describe('펫 체중 조회', function () {
+    it('체중 전체 조회', async function () {
+      const petWeights = await petService.getPetWeights(1);
+      expect(petWeights).to.be.an('array');
+      expect(petWeights[0].PET_ID).to.equal(1);
+    });
+    it('체중 날짜별 조회', async function () {
+      const petWeights = await petService.getPetWeights(1,'2024-02-15');
+      expect(petWeights).to.be.an('array');
+      expect(petWeights[0].PET_ID).to.equal(1);
+    });
   });
 });
