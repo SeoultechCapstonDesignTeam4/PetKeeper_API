@@ -7,9 +7,6 @@ async function getPets() {
   const pets = await p_pet.findAll({
     include: [
       {
-        model: p_user,
-        as: 'USER',
-      },{
         model: p_pet_vaccination,
         as: 'p_pet_vaccinations',
       },{
@@ -84,9 +81,6 @@ async function getPetByUserId(USER_ID) {
   const pets = await p_pet.findAll({ 
     include: [
       {
-        model: p_user,
-        as: 'USER',
-      },{
         model: p_pet_vaccination,
         as: 'p_pet_vaccinations',
       },{
@@ -102,9 +96,9 @@ async function getPetByUserId(USER_ID) {
   return pets;
 }
 
-async function addPet(pet) {
+async function addPet(pet,user_id) {
+  pet.USER_ID = user_id;
   const createdPet = await p_pet.create(pet);
-  
   if (!createdPet) {
     throw new Error('Pet not created');
   }
@@ -178,7 +172,14 @@ async function getPetVaccinationByDate(id,date){
   return petVaccination;
 }
 async function getPetVaccinationById(vaccination_id){
-  const petVaccination = await p_pet_vaccination.findOne({ where: { PET_VACCINATION_ID: vaccination_id } });
+  const petVaccination = await p_pet_vaccination.findOne({
+    include:
+      {
+        model: p_pet,
+        as: 'PET',
+      }
+    ,where: { PET_VACCINATION_ID: vaccination_id }
+  });
   if (!petVaccination) {
     throw new Error('Pet_Vaccination not found');
   }
@@ -229,7 +230,7 @@ async function getPetWeights(id){
   return petWeight;
 }
 
-async function getPetWeight(id,date){
+async function getPetWeightByDate(id,date){
   const petValidate = await p_pet.findOne({ where: { PET_ID: id } });
   if (!petValidate) {
     throw new Error('Pet not found');
@@ -241,6 +242,21 @@ async function getPetWeight(id,date){
         {PET_ID: id}
       ]
     }
+  });
+  if (!petWeight) {
+    throw new Error('Pet_WEIGHT not found');
+  }
+  return petWeight;
+}
+
+async function getPetWeightById(weight_id){
+  const petWeight = await p_pet_weight.findOne({
+    include:
+      {
+        model: p_pet,
+        as: 'PET'
+      }
+    ,where: { PET_WEIGHT_ID: weight_id }
   });
   if (!petWeight) {
     throw new Error('Pet_WEIGHT not found');
@@ -299,7 +315,8 @@ module.exports ={
   deletePetVaccination,
 
   getPetWeights,
-  getPetWeight,
+  getPetWeightByDate,
+  getPetWeightById,
   addPetWeight,
   updatePetWeight,
   deletePetWeight

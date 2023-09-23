@@ -383,7 +383,7 @@ describe('펫 체중 단위테스트', function () {
       expect(petWeights[0].PET_ID).to.equal(1);
     });
     it('체중 날짜별 조회', async function () {
-      const petWeights = await petService.getPetWeights(1,'2024-02-15');
+      const petWeights = await petService.getPetWeightByDate(1,'2024-02-15');
       expect(petWeights).to.be.an('array');
       expect(petWeights[0].PET_ID).to.equal(1);
     });

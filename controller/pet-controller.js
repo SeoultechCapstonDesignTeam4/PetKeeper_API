@@ -3,11 +3,11 @@ const {uploadImg,deleteImg} = require('../routes/middle/aws-s3');
 const sharp = require('sharp');
 
 async function getPet(req,res){
-  const userInfo = res.locals.userInfo;
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const {id} = req.params;
   try{
     const data = await petService.getPetById(id);
-    if(userInfo.USER_AUTH === 'admin' || userInfo.USER_ID === data.USER_ID){
+    if(USER_AUTH === 'admin' || USER_ID === data.USER_ID){
       return res.status(200).json(data).end();
     }
   }catch(err){
@@ -23,11 +23,11 @@ async function getPets(req,res){
 }
 
 async function deletePetImg(req,res){
-  const userInfo = res.locals.userInfo;
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const {id} = req.params;
   try{
     const pet = await petService.getPetById(id);
-    if(userInfo.USER_AUTH ==='admin' || pet.USER_ID === userInfo.USER_ID){
+    if(USER_AUTH ==='admin' || pet.USER_ID === USER_ID){
       const target = pet.PET_IMAGE.split('/')[3]+"/"+pet.PET_IMAGE.split('/')[4];
       if(target !== 'pet-profile/default-img'){
         await deleteImg(target);
@@ -50,7 +50,7 @@ async function deletePetImg(req,res){
 
 async function uploadPetImg(req,res){
   const image = req.file;
-  const userInfo = res.locals.userInfo;
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const {id} = req.params;
   const key = 'pet-profile/' + `${id}_${Date.now()}`
   const url = 'https://'+process.env.s3_bucket+'.s3.'+process.env.s3_region+'.amazonaws.com/'+key;
@@ -59,7 +59,7 @@ async function uploadPetImg(req,res){
       throw new Error('No File');
     }
     const pet = await petService.getPetById(id);
-    if(userInfo.USER_AUTH ==='admin' || pet.USER_ID === userInfo.USER_ID){
+    if(USER_AUTH ==='admin' || pet.USER_ID === USER_ID){
       if(pet.PET_IMAGE !== null){
         const target = pet.PET_IMAGE.split('/')[3]+"/"+pet.PET_IMAGE.split('/')[4];
         await deleteImg(target);
@@ -80,14 +80,13 @@ async function uploadPetImg(req,res){
 }
 
 async function addPet(req,res){
-  const userInfo = res.locals.userInfo;
-  let {pet} = req.body;
-  pet.USER_ID = userInfo.USER_ID;
+  const {USER_ID} = res.locals.userInfo;
+  let pet = req.body;
   try{
     if(!pet){
       throw new Error('No pet');
     }
-    const data = await petService.addPet(pet);
+    const data = await petService.addPet(pet,USER_ID);
     return res.status(200).json(pet).end();;
   }catch(err){
     return res.status(403).json({
@@ -98,15 +97,15 @@ async function addPet(req,res){
 }
 
 async function updatePet(req,res){
-  const userInfo = res.locals.userInfo;
-  let {pet} = req.body;
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
+  let pet = req.body;
   const {id} = req.params;
   try{
     if(!pet){
       throw new Error('No pet');
     }
     const petInfo = await petService.getPetById(id);
-    if(userInfo.USER_AUTH === 'admin' || petInfo.USER_ID ===userInfo.USER_ID){
+    if(USER_AUTH === 'admin' || petInfo.USER_ID === USER_ID){
       const data = await petService.updatePet(pet,id);
       return res.status(200).json(pet).end();
     }else{
@@ -120,12 +119,12 @@ async function updatePet(req,res){
   }
 }
 async function deletePet(req,res){
-  const userInfo = res.locals.userInfo;
-  const {id} = req.params;
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
+  const {PET_ID} = req.params;
   try{
-    const petInfo = await petService.getPetById(id);
-    if(userInfo.USER_AUTH === 'admin' || petInfo.USER_ID ===userInfo.USER_ID){
-      const data = await petService.deletePet(id);
+    const petInfo = await petService.getPetById(PET_ID);
+    if(USER_AUTH === 'admin' || petInfo.USER_ID === USER_ID){
+      const data = await petService.deletePet(PET_ID);
       return res.status(200).json(data).end();;
     }else{
       throw new Error('permission denied');
@@ -139,16 +138,16 @@ async function deletePet(req,res){
 }
 
 async function addPetVaccination(req,res){
-  const userInfo = res.locals.userInfo;
-  let {vaccination} = req.body;
-  const {id} = req.params;
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
+  let vaccination = req.body;
+  const {PET_ID} = req.params;
   try{
     if(!vaccination){
       throw new Error('No vaccination');
     }
-    const petInfo = await petService.getPetById(id);
-    if(userInfo.USER_AUTH === 'admin' || petInfo.USER_ID ===userInfo.USER_ID){
-      const data = await petService.addPetVaccination(vaccination,id);
+    const petInfo = await petService.getPetById(PET_ID);
+    if(USER_AUTH === 'admin' || petInfo.USER_ID === USER_ID){
+      const data = await petService.addPetVaccination(vaccination,PET_ID);
       return res.status(200).json(vaccination).end();;
     }else{
       throw new Error('permission denied');
@@ -161,12 +160,56 @@ async function addPetVaccination(req,res){
   }
 }
 async function deletePetVaccination(req,res){
-  const userInfo = res.locals.userInfo;
-  const {id} = req.params;
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
+  const {PET_VACCINATION_ID} = req.params;
   try{
-    const petInfo = await petService.getPetVaccinationById(id);
-    if(userInfo.USER_AUTH === 'admin' || petInfo.USER_ID ===userInfo.USER_ID){
-      const data = await petService.deletePetVaccination(id);
+    const petInfo = await petService.getPetVaccinationById(PET_VACCINATION_ID);
+    const owner_user_Id = petInfo.PET.USER_ID;
+    if(USER_AUTH === 'admin' || owner_user_Id === USER_ID){
+      const data = await petService.deletePetVaccination(PET_VACCINATION_ID);
+      return res.status(200).json(data).end();;
+    }else{
+      throw new Error('permission denied');
+    }
+  }catch(err){
+    return res.status(403).json({
+      success: false,
+      message: err.message
+    }).end();
+  }
+}
+
+async function addPetWeight(req,res){
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
+  let weight = req.body;
+  const {PET_ID} = req.params;
+  try{
+    if(!weight){
+      throw new Error('No weight');
+    }
+    const petInfo = await petService.getPetById(PET_ID);
+    if(USER_AUTH === 'admin' || petInfo.USER_ID === USER_ID){
+      const data = await petService.addPetWeight(weight,PET_ID);
+      return res.status(200).json(data).end();;
+    }else{
+      throw new Error('permission denied');
+    }
+  }catch(err){
+    return res.status(403).json({
+      success: false,
+      message: err.message
+    }).end();
+  }
+}
+
+async function deletePetWeight(req,res){
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
+  const {PET_WEIGHT_ID} = req.params;
+  try{
+    const weightInfo = await petService.getPetWeightById(PET_WEIGHT_ID);
+    const owner_user_Id = weightInfo.PET.USER_ID
+    if(USER_AUTH === 'admin' || owner_user_Id === USER_ID){
+      const data = await petService.deletePetWeight(PET_WEIGHT_ID);
       return res.status(200).json(data).end();;
     }else{
       throw new Error('permission denied');
@@ -190,4 +233,8 @@ module.exports ={
 
   addPetVaccination,
   deletePetVaccination,
+
+  addPetWeight,
+  deletePetWeight,
+
 }

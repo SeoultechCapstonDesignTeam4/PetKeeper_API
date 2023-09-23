@@ -161,7 +161,9 @@ router.put('/:id', normalAuth, petController.updatePet);
  *    "PET_KIND": "진도"
  * }
  */
-router.delete('/:id', normalAuth, petController.deletePet);
-router.post('/vaccination/:id', normalAuth, petController.addPetVaccination);
-router.delete('/vaccination/:id', normalAuth, petController.deletePetVaccination);
+router.delete('/:PET_ID', normalAuth, petController.deletePet);
+router.post('/vaccination/:PET_ID', normalAuth, petController.addPetVaccination);
+router.delete('/vaccination/:PET_VACCINATION_ID', normalAuth, petController.deletePetVaccination);
+router.post('/weight/:PET_ID',normalAuth,petController.addPetWeight);
+router.delete('/weight/:PET_WEIGHT_ID',normalAuth,petController.deletePetWeight);
 module.exports = router;

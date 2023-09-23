@@ -6,13 +6,13 @@ const {uploadImg,deleteImg} = require('../routes/middle/aws-s3');
 const sharp = require('sharp');
 
 async function deleteUserImg(req, res) {
-  const userInfo = res.locals.userInfo;
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const { id } = req.params;
 
   try {
     const user = await userService.getUserById(id);
 
-    if (userInfo.USER_AUTH == 'admin' || user.USER_ID == userInfo.USER_ID) {
+    if (USER_AUTH == 'admin' || user.USER_ID == USER_ID) {
       const target = user.USER_IMAGE.split('/')[3] + '/' + user.USER_IMAGE.split('/')[4];
 
       if (target !== 'user-profile/default-img') {
@@ -45,7 +45,7 @@ async function uploadUserImg(req, res) {
     }).end();
   }
 
-  const userInfo = res.locals.userInfo;
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const { id } = req.params;
   const key = 'user-profile/' + `${id}_${Date.now()}`;
   const url = 'https://' + process.env.s3_bucket + '.s3.' + process.env.s3_region + '.amazonaws.com/' + key;
@@ -53,7 +53,7 @@ async function uploadUserImg(req, res) {
   try {
     const user = await userService.getUserById(id);
 
-    if (userInfo.USER_AUTH == 'admin' || user.USER_ID == userInfo.USER_ID) {
+    if (USER_AUTH == 'admin' || user.USER_ID == USER_ID) {
       if (user.USER_IMAGE !== null) {
         const target = user.USER_IMAGE.split('/')[3] + '/' + user.USER_IMAGE.split('/')[4];
         await deleteImg(target);
@@ -119,8 +119,8 @@ async function generateToken(user) {
 
 
 async function logout(req, res) {
-  const userInfo = res.locals.userInfo;
-  await p_user.update({ USER_ACCESSTOKEN: null }, { where: { USER_EMAIL: userInfo.USER_EMAIL } });
+  const {USER_EMAIL} = res.locals.userInfo;
+  await p_user.update({ USER_ACCESSTOKEN: null }, { where: { USER_EMAIL: USER_EMAIL } });
   res.setHeader('Authorization', null);
   return res.json({
     success: true,
@@ -129,10 +129,10 @@ async function logout(req, res) {
 }
 
 async function getUser(req, res) {
-  const userInfo = res.locals.userInfo;
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const { id } = req.params;
   try {
-    if (userInfo.USER_AUTH == 'admin' || userInfo.USER_ID == id) {
+    if (USER_AUTH == 'admin' || USER_ID == id) {
       const data = await userService.getUserById(id);
       return res.status(200).json(data).end();
     } else {
@@ -181,7 +181,7 @@ async function addUser(req, res) {
 }
 
 async function updateUser(req, res) {
-  const userInfo = res.locals.userInfo;
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const user = req.body;
   const {id} = req.params;
 
@@ -192,7 +192,7 @@ async function updateUser(req, res) {
       throw new Error('Phone, email, or password is empty');
     }
 
-    if (userInfo.USER_AUTH == 'admin' || userInfo.USER_ID == id) {
+    if (USER_AUTH == 'admin' || USER_ID == id) {
       user.USER_PASSWORD = bcrypt.hashSync(user.USER_PASSWORD, 10);
       const data = await userService.updateUser(user,id);
       data.USER_PASSWORD = '********';
@@ -209,11 +209,10 @@ async function updateUser(req, res) {
 }
 
 async function deleteUser(req, res) {
-  const userInfo = res.locals.userInfo;
-  const userId = userInfo.USER_ID;
+  const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const { id } = req.params;
   try {
-    if (userInfo.USER_AUTH == 'admin' || userInfo.USER_ID == id) {
+    if (USER_AUTH == 'admin' || USER_ID == id) {
       const data = await userService.deleteUser(id);
       return res.status(200).json(data).end();
     } else {
@@ -228,6 +227,13 @@ async function deleteUser(req, res) {
   }
 }
 
+function permissionCheck(USER_AUTH, USER_ID, id) {
+  if (USER_AUTH == 'admin' || USER_ID == id) {
+    return true;
+  } else {
+    return false;
+  }
+}
 module.exports ={
   login,
   logout,
