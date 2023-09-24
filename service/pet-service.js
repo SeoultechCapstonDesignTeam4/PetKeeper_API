@@ -59,7 +59,7 @@ async function uploadPetImg(PET_ID, key) {
   return numOfAffectedRows;
 }
 
-async function getPetById(id) {
+async function getPetById(PET_ID) {
   const pet = await p_pet.findOne({ 
     include: [
     {
@@ -69,7 +69,7 @@ async function getPetById(id) {
         model: p_pet_weight,
         as: 'p_pet_weights',
       }
-    ],where: { PET_ID: id } });
+    ],where: { PET_ID: PET_ID } });
   
   if (!pet) {
     throw new Error('Pet not found');
@@ -96,8 +96,8 @@ async function getPetByUserId(USER_ID) {
   return pets;
 }
 
-async function addPet(pet,user_id) {
-  pet.USER_ID = user_id;
+async function addPet(pet,USER_ID) {
+  pet.USER_ID = USER_ID;
   const createdPet = await p_pet.create(pet);
   if (!createdPet) {
     throw new Error('Pet not created');
@@ -106,15 +106,15 @@ async function addPet(pet,user_id) {
   return createdPet;
 }
 
-async function updatePet(pet,id) {
-  const check = await p_pet.findOne({ where: { PET_ID: id } });
+async function updatePet(pet,PET_ID) {
+  const check = await p_pet.findOne({ where: { PET_ID: PET_ID } });
   if (!check) {
     throw new Error('Pet not found');
   }
 
   const [numOfAffectedRows] = await p_pet.update(
     pet,
-    { where: { PET_ID: id } }
+    { where: { PET_ID: PET_ID } }
   );
   
   if (numOfAffectedRows === 0) {
@@ -123,17 +123,17 @@ async function updatePet(pet,id) {
   return pet;
 }
 
-async function deletePet(id) {
+async function deletePet(PET_ID) {
   // const [numOfAffectedRows] = await p_pet.update(
   //   { IS_DELETED: true },
   //   { where: { PET_ID: id } }
   // );
-  const check = await p_pet.findOne({ where: { PET_ID: id } });
+  const check = await p_pet.findOne({ where: { PET_ID: PET_ID } });
   if (!check) {
     throw new Error('Pet not found');
   }
 
-  const numOfAffectedRows = await p_pet.destroy({ where: { PET_ID: id } });
+  const numOfAffectedRows = await p_pet.destroy({ where: { PET_ID: PET_ID } });
   
   if (numOfAffectedRows === 0) {
     throw new Error('Pet not deleted');
@@ -142,19 +142,19 @@ async function deletePet(id) {
   return numOfAffectedRows;
 }
 
-async function getPetVaccinations(id){
-  const petValidate = await p_pet.findOne({ where: { PET_ID: id } });
+async function getPetVaccinations(PET_ID){
+  const petValidate = await p_pet.findOne({ where: { PET_ID: PET_ID } });
   if (!petValidate) {
     throw new Error('Pet not found');
   }
-  const petVaccination = await p_pet_vaccination.findAll({ where: { PET_ID: id } });
+  const petVaccination = await p_pet_vaccination.findAll({ where: { PET_ID: PET_ID } });
   if (!petVaccination) {
     throw new Error('Pet_Vaccination not found');
   }
   return petVaccination;
 }
-async function getPetVaccinationByDate(id,date){
-  const petValidate = await p_pet.findOne({ where: { PET_ID: id } });
+async function getPetVaccinationByDate(PET_ID,date){
+  const petValidate = await p_pet.findOne({ where: { PET_ID: PET_ID } });
   if (!petValidate) {
     throw new Error('Pet not found');
   }
@@ -162,7 +162,7 @@ async function getPetVaccinationByDate(id,date){
     where: {
       [Op.and]: [
         {PET_VACCINATION_DATE: date},
-        {PET_ID: id}
+        {PET_ID: PET_ID}
       ]
     }
   });
@@ -171,22 +171,22 @@ async function getPetVaccinationByDate(id,date){
   }
   return petVaccination;
 }
-async function getPetVaccinationById(vaccination_id){
+async function getPetVaccinationById(PET_VACCINATION_ID){
   const petVaccination = await p_pet_vaccination.findOne({
     include:
       {
         model: p_pet,
         as: 'PET',
       }
-    ,where: { PET_VACCINATION_ID: vaccination_id }
+    ,where: { PET_VACCINATION_ID: PET_VACCINATION_ID }
   });
   if (!petVaccination) {
     throw new Error('Pet_Vaccination not found');
   }
   return petVaccination;
 }
-async function addPetVaccination(vaccination,pet_id){
-  vaccination.PET_ID = pet_id;
+async function addPetVaccination(vaccination,PET_ID){
+  vaccination.PET_ID = PET_ID;
   const createdVaccination = await p_pet_vaccination.create(vaccination);
   if (!createdVaccination) {
     throw new Error('Pet_Vaccination not created');
@@ -194,44 +194,44 @@ async function addPetVaccination(vaccination,pet_id){
   return createdVaccination;
 }
 
-async function updatePetVaccination(vaccination,vaccination_id){
-  const petValidate = await p_pet_vaccination.findOne({ where: { PET_VACCINATION_ID: vaccination_id } });
+async function updatePetVaccination(vaccination,PET_VACCINATION_ID){
+  const petValidate = await p_pet_vaccination.findOne({ where: { PET_VACCINATION_ID: PET_VACCINATION_ID } });
   if (!petValidate) {
     throw new Error('Pet not found');
   }
-  const updatedVaccination = await p_pet_vaccination.update(vaccination, { where: { PET_VACCINATION_ID: vaccination_id } });
+  const updatedVaccination = await p_pet_vaccination.update(vaccination, { where: { PET_VACCINATION_ID: PET_VACCINATION_ID } });
   if (!updatedVaccination) {
     throw new Error('Pet_Vaccination not updated');
   }
   return vaccination;
 }
 
-async function deletePetVaccination(vaccination_id){
-  const petValidate = await p_pet_vaccination.findOne({ where: { PET_VACCINATION_ID: vaccination_id } });
+async function deletePetVaccination(PET_VACCINATION_ID){
+  const petValidate = await p_pet_vaccination.findOne({ where: { PET_VACCINATION_ID: PET_VACCINATION_ID } });
   if (!petValidate) {
     throw new Error('Pet_Vaccination not found');
   }
-  const deletedVaccination = await p_pet_vaccination.destroy({ where: { PET_VACCINATION_ID: vaccination_id } });
+  const deletedVaccination = await p_pet_vaccination.destroy({ where: { PET_VACCINATION_ID: PET_VACCINATION_ID } });
   if (!deletedVaccination) {
     throw new Error('Pet_Vaccination not deleted');
   }
   return deletedVaccination;
 }
 
-async function getPetWeights(id){
-  const petValidate = await p_pet.findOne({ where: { PET_ID: id } });
+async function getPetWeights(PET_ID){
+  const petValidate = await p_pet.findOne({ where: { PET_ID: PET_ID } });
   if (!petValidate) {
     throw new Error('Pet not found');
   }
-  const petWeight = await p_pet_weight.findAll({ where: { PET_ID: id } });
+  const petWeight = await p_pet_weight.findAll({ where: { PET_ID: PET_ID } });
   if (!petWeight) {
     throw new Error('Pet_WEIGHT not found');
   }
   return petWeight;
 }
 
-async function getPetWeightByDate(id,date){
-  const petValidate = await p_pet.findOne({ where: { PET_ID: id } });
+async function getPetWeightByDate(PET_ID,date){
+  const petValidate = await p_pet.findOne({ where: { PET_ID: PET_ID } });
   if (!petValidate) {
     throw new Error('Pet not found');
   }
@@ -239,7 +239,7 @@ async function getPetWeightByDate(id,date){
     where: {
       [Op.and]: [
         {PET_WEIGHT_DATE: date},
-        {PET_ID: id}
+        {PET_ID: PET_ID}
       ]
     }
   });
@@ -249,14 +249,14 @@ async function getPetWeightByDate(id,date){
   return petWeight;
 }
 
-async function getPetWeightById(weight_id){
+async function getPetWeightById(PET_WEIGHT_ID){
   const petWeight = await p_pet_weight.findOne({
     include:
       {
         model: p_pet,
         as: 'PET'
       }
-    ,where: { PET_WEIGHT_ID: weight_id }
+    ,where: { PET_WEIGHT_ID: PET_WEIGHT_ID }
   });
   if (!petWeight) {
     throw new Error('Pet_WEIGHT not found');
@@ -264,32 +264,32 @@ async function getPetWeightById(weight_id){
   return petWeight;
 }
 
-async function addPetWeight(info,id){
-  info.PET_ID = id;
+async function addPetWeight(info,PET_ID){
+  info.PET_ID = PET_ID;
   const createdWeight = await p_pet_weight.create(info);
   if (!createdWeight) {
     throw new Error('Pet_WEIGHT not created');
   }
   return createdWeight;
 }
-async function updatePetWeight(info,id){
-  const petValidate = await p_pet_weight.findOne({ where: { PET_WEIGHT_ID: id } });
+async function updatePetWeight(info,PET_WEIGHT_ID){
+  const petValidate = await p_pet_weight.findOne({ where: { PET_WEIGHT_ID: PET_WEIGHT_ID } });
   if (!petValidate) {
     throw new Error('Pet not found');
   }
-  const updatedWeight = await p_pet_weight.update(info, { where: { PET_WEIGHT_ID: id } });
+  const updatedWeight = await p_pet_weight.update(info, { where: { PET_WEIGHT_ID: PET_WEIGHT_ID } });
   if (!updatedWeight) {
     throw new Error('Pet_WEIGHT not updated');
   }
   return info;
 }
 
-async function deletePetWeight(id){
-  const petValidate = await p_pet_weight.findOne({ where: { PET_WEIGHT_ID: id } });
+async function deletePetWeight(PET_WEIGHT_ID){
+  const petValidate = await p_pet_weight.findOne({ where: { PET_WEIGHT_ID: PET_WEIGHT_ID } });
   if (!petValidate) {
     throw new Error('Pet not found');
   }
-  const deletedWeight = await p_pet_weight.destroy({ where: { PET_WEIGHT_ID: id } });
+  const deletedWeight = await p_pet_weight.destroy({ where: { PET_WEIGHT_ID: PET_WEIGHT_ID } });
   if (!deletedWeight) {
     throw new Error('Pet_WEIGHT not deleted');
   }

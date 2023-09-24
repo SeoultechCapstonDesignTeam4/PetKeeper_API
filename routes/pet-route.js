@@ -164,6 +164,8 @@ router.put('/:id', normalAuth, petController.updatePet);
 router.delete('/:PET_ID', normalAuth, petController.deletePet);
 router.post('/vaccination/:PET_ID', normalAuth, petController.addPetVaccination);
 router.delete('/vaccination/:PET_VACCINATION_ID', normalAuth, petController.deletePetVaccination);
+router.put('/vaccination/:PET_VACCINATION_ID', normalAuth, petController.updatePetVaccination);
 router.post('/weight/:PET_ID',normalAuth,petController.addPetWeight);
 router.delete('/weight/:PET_WEIGHT_ID',normalAuth,petController.deletePetWeight);
+router.put('/weight/:PET_WEIGHT_ID',normalAuth,petController.updatePetWeight);
 module.exports = router;
