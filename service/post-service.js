@@ -27,9 +27,9 @@ async function getPosts() {
   return posts;
 }
 
-async function getPostsByUserId(user_id){
+async function getPostsByUserId(USER_ID){
   const posts = await p_post.findAll({
-    where: {USER_ID: user_id},
+    where: {USER_ID: USER_ID},
     include: [{
         model: p_user,
         as: 'USER',
@@ -48,9 +48,9 @@ async function getPostsByUserId(user_id){
   return posts;
 }
 
-async function getPostById(id) {
+async function getPostById(POST_ID) {
   const post = await p_post.findOne({
-    where: { POST_ID: id },
+    where: { POST_ID: POST_ID },
     include: [{
       model: p_user,
       as: 'USER',
@@ -74,8 +74,8 @@ async function getPostById(id) {
   return post;
 }
 
-async function addPost(post,user_id) {
-  post.USER_ID = user_id;
+async function addPost(post,USER_ID) {
+  post.USER_ID = USER_ID;
   const createdPost = await p_post.create(post);
   
   if (!createdPost) {
@@ -85,59 +85,58 @@ async function addPost(post,user_id) {
   return createdPost;
 }
 
-async function updatePost(post,id) {
-  const check = await p_post.findOne({ where: { POST_ID: id } });
+async function updatePost(post,POST_ID) {
+  const check = await p_post.findOne({ where: { POST_ID: POST_ID } });
   if (!check) {
     throw new Error('Post not found');
   }
   const [numOfAffectedRows] = await p_post.update(
     post,
-    { where: { POST_ID: id } }
+    { where: { POST_ID: POST_ID } }
   );
   return post
 }
 
-async function deletePost(id) {
-  const existingPost = await p_post.findOne({
-    where: { POST_ID: id },
-    include: [{
-      model: p_user,
-      as: 'USER',
-    },{
-      model: p_post_photo,
-      as: 'p_post_photos',
-    },{
-      model: p_post_like,
-      as: 'p_post_likes',
-    },{
-      model: p_post_comment,
-      as: 'p_post_comments',
+async function deletePost(POST_ID) {
+  const t = await sequelize.transaction();
+  try {
+    const existingPost = await p_post.findOne({
+      where: { POST_ID: POST_ID },
+      include: [
+        { model: p_user, as: 'USER' },
+        { model: p_post_photo, as: 'p_post_photos' },
+        { model: p_post_like, as: 'p_post_likes' },
+        { model: p_post_comment, as: 'p_post_comments' }
+      ]
+    }, { transaction: t });
+
+    if (!existingPost) {
+      throw new Error('Post not found');
     }
-  ]
-  });
-  if (!existingPost) {
-    throw new Error('Post not found');
-  }
 
-  if (existingPost.p_post_photos.length) {
-    await p_post_photo.destroy({ where: { POST_ID: postId } });
-  }
-  if (existingPost.p_post_likes.length) {
-    await p_post_like.destroy({ where: { POST_ID: postId } });
-  }
-  if (existingPost.p_post_comments.length) {
-    await p_post_comment.destroy({ where: { POST_ID: postId } });
-  }
-  const numOfAffectedRows = await p_post.destroy({
-    where: { POST_ID: id },
-  });
+    if (existingPost.p_post_photos.length) {
+      await p_post_photo.destroy({ where: { POST_ID: POST_ID } }, { transaction: t });
+    }
+    if (existingPost.p_post_likes.length) {
+      await p_post_like.destroy({ where: { POST_ID: POST_ID } }, { transaction: t });
+    }
 
-  return numOfAffectedRows;
+    const numOfAffectedRows = await p_post.destroy({
+      where: { POST_ID: POST_ID },
+    }, { transaction: t });
+
+    await t.commit();
+
+    return numOfAffectedRows;
+  } catch (error) {
+    await t.rollback();
+    throw error;
+  }
 }
 
-async function getLikesByPostId(id) {
+async function getLikesByPostId(POST_ID) {
   const likes = await p_post_like.findAll({
-    where: { POST_ID: id },
+    where: { POST_ID: POST_ID },
     include:{
       model: p_user,
       as: 'USER',
@@ -145,20 +144,16 @@ async function getLikesByPostId(id) {
   });
   return likes;
 }
-async function getLikesByUserId(user_id) {
+async function getLikesByUserId(USER_ID) {
   const likes = await p_post_like.findAll({
-    where: { USER_ID: user_id },
-    include:{
-      model: p_user,
-      as: 'USER',
-    }
+    where: { USER_ID: USER_ID }
   });
   return likes;
 }
-async function addLike(post_id,user_id){
+async function addLike(POST_ID,USER_ID){
   const info ={
-    POST_ID: post_id,
-    USER_ID: user_id,
+    POST_ID: POST_ID,
+    USER_ID: USER_ID,
   }
   const createdLike = await p_post_like.create(info);
   if (!createdLike) {
@@ -167,12 +162,12 @@ async function addLike(post_id,user_id){
   return createdLike;
 }
 
-async function deleteLike(post_id,user_id) {
+async function deleteLike(POST_ID,USER_ID) {
   const existingLike = await p_post_like.findOne({
     where: {
         [Op.and]: [
-          { POST_ID: post_id },
-          { USER_ID: user_id },
+          { POST_ID: POST_ID },
+          { USER_ID: USER_ID },
         ]
       }
   });
@@ -182,15 +177,16 @@ async function deleteLike(post_id,user_id) {
   const numOfAffectedRows = await p_post_like.destroy({
     where: {
       [Op.and]: [
-        { POST_ID: post_id },
-        { USER_ID: user_id },
+        { POST_ID: POST_ID },
+        { USER_ID: USER_ID },
       ]
     },
   });
   return numOfAffectedRows;
 }
 
-async function addPostPhoto(photo) {
+async function addPostPhoto(photo,USER_ID) {
+  photo.USER_ID = USER_ID;
   const createdPhoto = await p_post_photo.create(photo);
   if (!createdPhoto) {
     throw new Error('Photo not created');
@@ -198,53 +194,45 @@ async function addPostPhoto(photo) {
   return createdPhoto;
 }
 
-async function getPostPhotosByPostId(id) {
+async function getPostPhotosByPostId(POST_ID) {
   const photos = await p_post_photo.findAll({
-    where: { POST_ID: id },
+    where: { POST_ID: POST_ID },
   });
   return photos;
 }
 
-async function updatePostPhoto(photo) {
-  const check = await p_post_photo.findOne({ where: { PHOTO_ID: photo.PHOTO_ID } });
+async function updatePostPhoto(photo,PHOTO_ID) {
+  const check = await p_post_photo.findOne({ where: { PHOTO_ID: PHOTO_ID } });
   if (!check) {
     throw new Error('Photo not found');
   }
   const [numOfAffectedRows] = await p_post_photo.update(
     photo,
-    { where: { PHOTO_ID: photo.PHOTO_ID } }
+    { where: { PHOTO_ID: PHOTO_ID } }
   );
   return photo
 }
-async function deletePostPhoto(photo) {
-  const existingPhoto = await p_post_photo.findOne({ 
-    where: {[Op.and]:[
-      { POST_ID: photo.POST_ID },
-      { USER_ID: photo.USER_ID },
-    ] }
-   });
+async function deletePostPhoto(PHOTO_ID) {
+  const existingPhoto = await p_post_photo.findOne({ where: { PHOTO_ID: PHOTO_ID } });
   if (!existingPhoto) {
     throw new Error('Photo not found');
   }
   const numOfAffectedRows = await p_post_photo.destroy({
-    where: {[Op.and]:[
-      { POST_ID: photo.POST_ID },
-      { USER_ID: photo.USER_ID },
-    ] }
+    where: { PHOTO_ID: PHOTO_ID },
   });
   return numOfAffectedRows;
 }
 
-async function getPostPhotosByUserId(user_id) {
+async function getPostPhotosByUserId(USER_ID) {
   const photos = await p_post_photo.findAll({
-    where: { USER_ID: user_id },
+    where: { USER_ID: USER_ID },
   });
   return photos;
 }
 
-async function getCommentsByPostId(id) {
+async function getCommentsByPostId(POST_ID) {
   const comments = await p_post_comment.findAll({
-    where: { POST_ID: id },
+    where: { POST_ID: POST_ID },
     include:{
       model: p_user,
       as: 'USER',
@@ -253,9 +241,9 @@ async function getCommentsByPostId(id) {
   return comments;
 }
 
-async function getCommentsByUserId(user_id) {
+async function getCommentsByUserId(USER_ID) {
   const comments = await p_post_comment.findAll({
-    where: { USER_ID: user_id },
+    where: { USER_ID: USER_ID },
     include:{
       model: p_user,
       as: 'USER',
@@ -264,7 +252,8 @@ async function getCommentsByUserId(user_id) {
   return comments;
 }
 
-async function addComment(comment) {
+async function addComment(comment,USER_ID) {
+  comment.USER_ID = USER_ID;
   const createdComment = await p_post_comment.create(comment);
   if (!createdComment) {
     throw new Error('Comment not created');
@@ -272,25 +261,25 @@ async function addComment(comment) {
   return createdComment;
 }
 
-async function updateComment(comment) {
-  const check = await p_post_comment.findOne({ where: { COMMENT_ID: comment.COMMENT_ID } });
+async function updateComment(comment,COMMENT_ID) {
+  const check = await p_post_comment.findOne({ where: { COMMENT_ID: COMMENT_ID } });
   if (!check) {
     throw new Error('Comment not found');
   }
   const [numOfAffectedRows] = await p_post_comment.update(
     comment,
-    { where: { COMMENT_ID: comment.COMMENT_ID } }
+    { where: { COMMENT_ID: COMMENT_ID } }
   );
   return comment
 }
 
-async function deleteComment(comment_id) {
-  const existingComment = await p_post_comment.findOne({ where: { COMMENT_ID: comment_id } });
+async function deleteComment(COMMENT_ID) {
+  const existingComment = await p_post_comment.findOne({ where: { COMMENT_ID: COMMENT_ID } });
   if (!existingComment) {
     throw new Error('Comment not found');
   }
   const numOfAffectedRows = await p_post_comment.destroy({
-    where: { COMMENT_ID: comment_id },
+    where: { COMMENT_ID: COMMENT_ID },
   });
   return numOfAffectedRows;
 }

@@ -23,6 +23,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: true
     },
+    POST_IMAGE: {
+      type: DataTypes.CHAR(255),
+      allowNull: true
+    },
     POST_UPLOAD_DATE: {
       type: DataTypes.DATE,
       allowNull: true,

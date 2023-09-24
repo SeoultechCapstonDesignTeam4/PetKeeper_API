@@ -5,14 +5,17 @@ const p_user = require('../models').p_user;
 const {uploadImg,deleteImg} = require('../routes/middle/aws-s3');
 const sharp = require('sharp');
 
+const {handleErrorResponse,permissionCheck} = require('../util/error');
+
+
 async function deleteUserImg(req, res) {
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const { id } = req.params;
 
   try {
     const user = await userService.getUserById(id);
-
-    if (USER_AUTH == 'admin' || user.USER_ID == USER_ID) {
+    
+    if (permissionCheck(USER_AUTH, USER_ID, user.USER_ID)) {
       const target = user.USER_IMAGE.split('/')[3] + '/' + user.USER_IMAGE.split('/')[4];
 
       if (target !== 'user-profile/default-img') {
@@ -28,10 +31,7 @@ async function deleteUserImg(req, res) {
       throw new Error('Permission denied');
     }
   } catch (err) {
-    return res.status(403).json({
-      success: false,
-      message: err.message
-    }).end();
+    handleErrorResponse(err, res);
   }
 }
 
@@ -53,7 +53,7 @@ async function uploadUserImg(req, res) {
   try {
     const user = await userService.getUserById(id);
 
-    if (USER_AUTH == 'admin' || user.USER_ID == USER_ID) {
+    if (permissionCheck(USER_AUTH, USER_ID, user.USER_ID)) {
       if (user.USER_IMAGE !== null) {
         const target = user.USER_IMAGE.split('/')[3] + '/' + user.USER_IMAGE.split('/')[4];
         await deleteImg(target);
@@ -68,10 +68,7 @@ async function uploadUserImg(req, res) {
       throw new Error('Permission denied');
     }
   } catch (err) {
-    return res.status(403).json({
-      success: false,
-      message: err.message
-    }).end();
+    handleErrorResponse(err, res);
   }
 }
 
@@ -80,7 +77,7 @@ async function login(req, res) {
 
   try {
     if (!USER_EMAIL || !USER_PASSWORD) {
-      throw new Error('Email or password is empty');
+      throw new Error('Email or password is not found');
     }
 
     const user = await userService.getUserByEmail(USER_EMAIL);
@@ -97,10 +94,7 @@ async function login(req, res) {
       throw new Error('Password does not match');
     }
   } catch (err) {
-    return res.status(403).json({
-      success: false,
-      message: err.message
-    }).end();
+    handleErrorResponse(err, res);
   }
 }
 
@@ -132,17 +126,14 @@ async function getUser(req, res) {
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const { id } = req.params;
   try {
-    if (USER_AUTH == 'admin' || USER_ID == id) {
+    if (permissionCheck(USER_AUTH, USER_ID, id)) {
       const data = await userService.getUserById(id);
       return res.status(200).json(data).end();
     } else {
       throw new Error('Permission denied');
     }
   } catch (err) {
-    return res.status(400).json({
-      success: false,
-      message: err.message
-    }).end();
+    handleErrorResponse(err, res);
   }
 }
 
@@ -151,10 +142,7 @@ async function getUsers(req, res) {
     const data = await userService.getUsers();
     return res.status(200).json(data).end();
   } catch (err) {
-    return res.status(400).json({
-      success: false,
-      message: err.message
-    }).end();
+    handleErrorResponse(err, res);
   }
 }
 
@@ -165,7 +153,7 @@ async function addUser(req, res) {
     if (!user) {
       throw new Error('User data not found');
     } else if (!user.USER_PHONE || !user.USER_EMAIL || !user.USER_PASSWORD) {
-      throw new Error('Phone, email, or password is empty');
+      throw new Error('Phone, email, or password is not found');
     }
 
     user.USER_PASSWORD = bcrypt.hashSync(user.USER_PASSWORD, 10);
@@ -173,10 +161,7 @@ async function addUser(req, res) {
     const data = await userService.addUser(user);
     return res.json(data);
   } catch (err) {
-    return res.status(403).json({
-      success: false,
-      message: err.message
-    }).end();
+    handleErrorResponse(err, res);
   }
 }
 
@@ -189,10 +174,10 @@ async function updateUser(req, res) {
     if (!user) {
       throw new Error('User data not found');
     } else if (!user.USER_PHONE || !user.USER_EMAIL || !user.USER_PASSWORD) {
-      throw new Error('Phone, email, or password is empty');
+      throw new Error('Phone, email, or password is not found');
     }
 
-    if (USER_AUTH == 'admin' || USER_ID == id) {
+    if (permissionCheck(USER_AUTH, USER_ID, id)) {
       user.USER_PASSWORD = bcrypt.hashSync(user.USER_PASSWORD, 10);
       const data = await userService.updateUser(user,id);
       data.USER_PASSWORD = '********';
@@ -201,10 +186,7 @@ async function updateUser(req, res) {
       throw new Error('Permission denied');
     }
   } catch (err) {
-    return res.status(403).json({
-      success: false,
-      message: err.message
-    }).end();
+    handleErrorResponse(err, res);
   }
 }
 
@@ -212,28 +194,19 @@ async function deleteUser(req, res) {
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const { id } = req.params;
   try {
-    if (USER_AUTH == 'admin' || USER_ID == id) {
+    if (permissionCheck(USER_AUTH, USER_ID, id)) {
       const data = await userService.deleteUser(id);
       return res.status(200).json(data).end();
     } else {
       throw new Error('Permission denied');
     }
   } catch (err) {
-    console.log(err.message)
-    return res.status(403).json({
-      success: false,
-      message: err.message
-    }).end();
+    handleErrorResponse(err, res);
   }
 }
 
-function permissionCheck(USER_AUTH, USER_ID, id) {
-  if (USER_AUTH == 'admin' || USER_ID == id) {
-    return true;
-  } else {
-    return false;
-  }
-}
+
+
 module.exports ={
   login,
   logout,
