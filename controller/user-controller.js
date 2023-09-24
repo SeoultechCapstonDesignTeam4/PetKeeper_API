@@ -4,7 +4,8 @@ const jwtUtil = require('../util/jwt-util');
 const p_user = require('../models').p_user;
 const {uploadImg,deleteImg} = require('../routes/middle/aws-s3');
 const sharp = require('sharp');
-
+// const {handleErrorResponse} = require('../util/error');
+// const {permissionCheck} = require('../util/error');
 const {handleErrorResponse,permissionCheck} = require('../util/error');
 
 

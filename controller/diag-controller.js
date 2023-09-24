@@ -6,7 +6,7 @@ const FormData = require('form-data');
 const path = require('path');
 const sharp = require('sharp');
 const {uploadImg,deleteImg}= require('../routes/middle/aws-s3');
-
+const {handleErrorResponse, permissionCheck} = require('../util/error');
 const ec2ip='http://'+process.env.EC2_PUBLIC_IP+':5000';
 const eyeurl = `${ec2ip}/predict`;
 
@@ -44,10 +44,7 @@ async function eye(req,res){
       return res.status(403).json(response);
     }
   }catch(err){
-    return res.status(403).json({
-      success: false,
-      message: err.message
-    })
+    handleErrorResponse(err, res);
   }
 }
 

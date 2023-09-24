@@ -32,7 +32,43 @@ function permissionCheck(USER_AUTH, USER_ID, id) {
   throw new Error('permission denied');
 }
 
+function getCurrentDate() {
+  const koreanOffset = 9 * 60; // Korea is UTC+9
+  const today = new Date(new Date().getTime() + koreanOffset * 60 * 1000);
+  
+  const yyyy = today.getUTCFullYear();
+  const mm = String(today.getUTCMonth() + 1).padStart(2, '0'); 
+  const dd = String(today.getUTCDate()).padStart(2, '0');
+  const hh = String(today.getUTCHours()).padStart(2, '0');
+  const min = String(today.getUTCMinutes()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+}
+
+const {uploadImg,deleteImg} = require('../routes/middle/aws-s3');
+
+function generateS3URL(key) {
+  return `https://${process.env.s3_bucket}.s3.${process.env.s3_region}.amazonaws.com/${key}`;
+}
+
+async function uploadImage(image, dirName,USER_ID) {
+  const key = `${dirName}/${USER_ID}_${Date.now()}`;
+  const url = generateS3URL(key);
+  const buffer = await sharp(image.buffer).resize({width:640,height:640}).withMetadata().toBuffer();
+  await uploadImg(buffer, key, image.mimetype);
+  return url;
+}
+
+async function deleteImage(imageUrl) {
+  const target = imageUrl.split('/')[3] + "/" + imageUrl.split('/')[4];
+  await deleteImg(target);
+}
+
+
+
 module.exports = {
   handleErrorResponse,
-  permissionCheck
+  permissionCheck,
+  getCurrentDate,
+  uploadImage,
+  deleteImage
 }

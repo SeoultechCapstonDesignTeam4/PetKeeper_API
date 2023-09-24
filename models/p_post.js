@@ -27,10 +27,9 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.CHAR(255),
       allowNull: true
     },
-    POST_UPLOAD_DATE: {
+    POST_UPLOADED_DATE: {
       type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+      allowNull: true
     }
   }, {
     sequelize,

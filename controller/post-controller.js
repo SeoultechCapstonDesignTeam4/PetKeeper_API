@@ -1,8 +1,8 @@
 const postService = require('../service/post-service');
-const {uploadImg,deleteImg} = require('../routes/middle/aws-s3');
 const sharp = require('sharp');
-const {handleErrorResponse,permissionCheck} = require('../util/error');
-
+const {handleErrorResponse,permissionCheck,getCurrentDate, uploadImage,
+  deleteImage} = require('../util/error');
+const dirName = 'post-photo';
 
 async function getPosts(req,res){
   try{
@@ -38,77 +38,66 @@ async function getPostsByUserId(req,res){
   }
 }
 
-async function addPost(req,res){
+
+
+async function addPost(req, res) {
   const image = req.file;
-  const {USER_ID} = res.locals.userInfo;
+  const { USER_ID } = res.locals.userInfo;
   let post = req.body;
-  try{
-    if(!post){
-      throw new Error('No post');
-    }
-    if(image){
-      const key = 'post-photo/' + `${USER_ID}_${Date.now()}`;
-      const url = 'https://' + process.env.s3_bucket + '.s3.' + process.env.s3_region + '.amazonaws.com/' + key;
-      const buffer = await sharp(image.buffer).resize({width:640,height:640}).withMetadata().toBuffer();
-      await uploadImg(buffer,key,image.mimetype);
-      post.POST_IMAGE = url;
-    }
-    const data = await postService.addPost(post,USER_ID);
-    return res.status(200).json(post).end();;
-  }catch(err){
-    handleErrorResponse(err, res);
+  post.POST_UPLOADED_DATE = getCurrentDate();
+
+  try {
+      if (!post) throw new Error('No post');
+      if (image) post.POST_IMAGE = await processImage(image, dirName, USER_ID);
+      
+      const data = await postService.addPost(post, USER_ID);
+      const photo = {
+          POST_ID: data.POST_ID,
+          POST_PATH: post.POST_IMAGE,
+          PHOTO_UPLOADED_DATE: post.POST_UPLOADED_DATE
+      };
+      await postService.addPostPhoto(photo, USER_ID);
+      return res.status(200).json(data).end();
+  } catch (err) {
+      handleErrorResponse(err, res);
   }
 }
 
-async function updatePost(req,res){
+async function updatePost(req, res) {
   const image = req.file;
-  const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  let post = req.body;
-  const {POST_ID} = req.params;
-  try{
-    if(!post){
-      throw new Error('No post');
-    }
-    const postInfo = await postService.getPostById(POST_ID);
-    if(permissionCheck(USER_AUTH,USER_ID,postInfo.USER_ID)){
-      if(image){
-        if(postInfo.POST_IMAGE !== null){
-          const target = postInfo.POST_IMAGE.split('/')[3]+"/"+postInfo.POST_IMAGE.split('/')[4];
-          await deleteImg(target);
-        }
-        const key = 'post-photo/' + `${USER_ID}_${Date.now()}`;
-        const url = 'https://' + process.env.s3_bucket + '.s3.' + process.env.s3_region + '.amazonaws.com/' + key;
-        const buffer = await sharp(image.buffer).resize({width:640,height:640}).withMetadata().toBuffer();
-        await uploadImg(buffer,key,image.mimetype);
-        post.POST_IMAGE = url;
+  const { USER_AUTH, USER_ID } = res.locals.userInfo;
+  const { POST_ID } = req.params;
+
+  try {
+      if (!post) throw new Error('No post');
+      const postInfo = await postService.getPostById(POST_ID);
+      
+      if (permissionCheck(USER_AUTH, USER_ID, postInfo.USER_ID)) {
+          if (image) {
+              if (postInfo.POST_IMAGE) await deleteImage(postInfo.POST_IMAGE);
+              post.POST_IMAGE = await processImage(image, dirName, USER_ID);
+          }
+          const data = await postService.updatePost(post, POST_ID);
+          return res.status(200).json(post).end();
       }
-      const data = await postService.updatePost(post,POST_ID);
-      return res.status(200).json(post).end();
-    }else{
-      throw new Error('permission denied');
-    }
-  }catch(err){
-    handleErrorResponse(err, res);
+  } catch (err) {
+      handleErrorResponse(err, res);
   }
 }
 
-async function deletePost(req,res){
-  const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  const {POST_ID} = req.params;
-  try{
-    const postInfo = await postService.getPostById(POST_ID);
-    if(permissionCheck(USER_AUTH,USER_ID,postInfo.USER_ID)){
-      if(postInfo.POST_IMAGE !== null){
-        const target = postInfo.POST_IMAGE.split('/')[3]+"/"+postInfo.POST_IMAGE.split('/')[4];
-        await deleteImg(target);
+async function deletePost(req, res) {
+  const { USER_AUTH, USER_ID } = res.locals.userInfo;
+  const { POST_ID } = req.params;
+
+  try {
+      const postInfo = await postService.getPostById(POST_ID);
+      if (permissionCheck(USER_AUTH, USER_ID, postInfo.USER_ID)) {
+          if (postInfo.POST_IMAGE) await deleteImage(postInfo.POST_IMAGE);
+          const data = await postService.deletePost(POST_ID);
+          return res.status(200).json(data).end();
       }
-      const data = await postService.deletePost(POST_ID);
-      return res.status(200).json(data).end();;
-    }else{
-      throw new Error('permission denied');
-    }
-  }catch(err){
-    handleErrorResponse(err, res);
+  } catch (err) {
+      handleErrorResponse(err, res);
   }
 }
 

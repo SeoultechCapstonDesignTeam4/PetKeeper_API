@@ -29,8 +29,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     PHOTO_UPLOADED_DATE: {
       type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+      allowNull: true
     }
   }, {
     sequelize,
