@@ -1,7 +1,7 @@
 const postService = require('../service/post-service');
-const sharp = require('sharp');
-const {handleErrorResponse,permissionCheck,getCurrentDate, uploadImage,
-  deleteImage} = require('../util/error');
+const {handleErrorResponse,permissionCheck,getCurrentDate} = require('../util/error');
+const {  uploadS3Image,deleteS3Image } = require('../util/s3-util');;
+
 const dirName = 'post-photo';
 
 async function getPosts(req,res){
@@ -48,7 +48,7 @@ async function addPost(req, res) {
 
   try {
       if (!post) throw new Error('No post');
-      if (image) post.POST_IMAGE = await processImage(image, dirName, USER_ID);
+      if (image) post.POST_IMAGE = await uploadS3Image(image, dirName, USER_ID);
       
       const data = await postService.addPost(post, USER_ID);
       const photo = {
@@ -74,8 +74,8 @@ async function updatePost(req, res) {
       
       if (permissionCheck(USER_AUTH, USER_ID, postInfo.USER_ID)) {
           if (image) {
-              if (postInfo.POST_IMAGE) await deleteImage(postInfo.POST_IMAGE);
-              post.POST_IMAGE = await processImage(image, dirName, USER_ID);
+              if (postInfo.POST_IMAGE) await deleteS3Image(postInfo.POST_IMAGE);
+              post.POST_IMAGE = await uploadS3Image(image, dirName, USER_ID);
           }
           const data = await postService.updatePost(post, POST_ID);
           return res.status(200).json(post).end();
@@ -92,7 +92,7 @@ async function deletePost(req, res) {
   try {
       const postInfo = await postService.getPostById(POST_ID);
       if (permissionCheck(USER_AUTH, USER_ID, postInfo.USER_ID)) {
-          if (postInfo.POST_IMAGE) await deleteImage(postInfo.POST_IMAGE);
+          if (postInfo.POST_IMAGE) await deleteS3Image(postInfo.POST_IMAGE);
           const data = await postService.deletePost(POST_ID);
           return res.status(200).json(data).end();
       }

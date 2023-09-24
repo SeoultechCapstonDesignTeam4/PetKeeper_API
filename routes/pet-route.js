@@ -82,7 +82,7 @@ router.post('/',normalAuth, petController.addPet);
     url: "https://petkeeper.s3.ap-northeast-2.amazonaws.com/pet-profile/9_1683162282101"
  *}
  */
-router.post('/pet-img/:id',
+router.post('/pet-img/:PET_ID',
   normalAuth,
   petImg.single('image'),
   petController.uploadPetImg);
@@ -102,7 +102,7 @@ router.post('/pet-img/:id',
  *}
  */
 
-router.delete('/pet-img/:id',
+router.delete('/pet-img/:PET_ID',
   normalAuth,
   petController.deletePetImg)
 
@@ -122,7 +122,7 @@ router.delete('/pet-img/:id',
  *}
  */
 
-router.get('/:id', normalAuth, petController.getPet);
+router.get('/:PET_ID', normalAuth, petController.getPet);
 /**
  * @api {put} /pet/:id update Pet information
  * @apiName updatePet
@@ -144,7 +144,7 @@ router.get('/:id', normalAuth, petController.getPet);
  *    "PET_KIND": "진도"
  * }
  */
-router.put('/:id', normalAuth, petController.updatePet);
+router.put('/:PET_ID', normalAuth, petController.updatePet);
 /**
  * @api {delete} /pet/:id delete Pet information
  * @apiName deletePet

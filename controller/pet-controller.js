@@ -1,13 +1,14 @@
 const petService = require('../service/pet-service');
-const {uploadImg,deleteImg} = require('../routes/middle/aws-s3');
+const {uploadS3Img,deleteS3Img, uploadS3Image, deleteS3Image} = require('../util/s3-util');
 const {permissionCheck,handleErrorResponse} = require('../util/error');
-const sharp = require('sharp');
+
+const dirName = 'pet-profile';
 
 async function getPet(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  const {id} = req.params;
+  const {PET_ID} = req.params;
   try{
-    const pet = await petService.getPetById(id);
+    const pet = await petService.getPetById(PET_ID);
     if(permissionCheck(USER_AUTH,USER_ID,pet.USER_ID)){
       return res.status(200).json(pet).end();
     }
@@ -26,14 +27,14 @@ async function getPets(req,res){
 
 async function deletePetImg(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  const {id} = req.params;
+  const {iPET_IDd} = req.params;
   try{
-    const pet = await petService.getPetById(id);
+    const pet = await petService.getPetById(PET_ID);
     if(permissionCheck(USER_AUTH,USER_ID,pet.USER_ID)){
       const target = pet.PET_IMAGE.split('/')[3]+"/"+pet.PET_IMAGE.split('/')[4];
-      if(target !== 'pet-profile/default-img'){
-        await deleteImg(target);
-        await petService.deletePetImg(id);
+      if(target !== `${dirName}/default-img`){
+        await deleteS3Image(pet.PET_IMAGE);
+        await petService.deletePetImg(PET_ID);
       }
       return res.status(200).json({
         success: true,
@@ -48,22 +49,20 @@ async function deletePetImg(req,res){
 async function uploadPetImg(req,res){
   const image = req.file;
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  const {id} = req.params;
-  const key = 'pet-profile/' + `${id}_${Date.now()}`
-  const url = 'https://'+process.env.s3_bucket+'.s3.'+process.env.s3_region+'.amazonaws.com/'+key;
+  const {PET_ID} = req.params;
+  
   try{
     if(!image){
       throw new Error('No File');
     }
-    const pet = await petService.getPetById(id);
+    const pet = await petService.getPetById(PET_ID);
     if(permissionCheck(USER_AUTH,USER_ID,pet.USER_ID)){
-      if(pet.PET_IMAGE !== null){
-        const target = pet.PET_IMAGE.split('/')[3]+"/"+pet.PET_IMAGE.split('/')[4];
-        await deleteImg(target);
+      const target = pet.PET_IMAGE.split('/')[3]+"/"+pet.PET_IMAGE.split('/')[4];
+      if(target !== `${dirName}/default-img`){
+        await deleteS3Image(pet.PET_IMAGE);
       }
-      const buffer = await sharp(image.buffer).resize({width:640,height:640}).withMetadata().toBuffer();
-      await uploadImg(buffer,key,image.mimetype);
-      await petService.uploadPetImg(id,url);
+      await uploadS3Image(image,dirName,USER_ID);
+      await petService.uploadPetImg(PET_ID,url);
       return res.status(200).json(url).end();;
     }
   }catch(err){
@@ -88,14 +87,14 @@ async function addPet(req,res){
 async function updatePet(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
   let pet = req.body;
-  const {id} = req.params;
+  const {PET_ID} = req.params;
   try{
     if(!pet){
       throw new Error('No pet');
     }
-    const petInfo = await petService.getPetById(id);
+    const petInfo = await petService.getPetById(PET_ID);
     if(permissionCheck(USER_AUTH,USER_ID,petInfo.USER_ID)){
-      const data = await petService.updatePet(pet,id);
+      const data = await petService.updatePet(pet,PET_ID);
       return res.status(200).json(pet).end();
     }
   }catch(err){

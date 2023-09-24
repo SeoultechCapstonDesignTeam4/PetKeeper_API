@@ -10,17 +10,17 @@ router.get('/logout', normalAuth, userController.logout);
 router.post('/login', userController.login);
 
 router.post('/', userController.addUser);
-router.post('/user-img/:id',
+router.post('/user-img/:TARGET_USER_ID',
   normalAuth,
   userImg.single('image'),
   userController.uploadUserImg
 );
-router.delete('/user-img/:id',
+router.delete('/user-img/:TARGET_USER_ID',
   normalAuth,
   userController.deleteUserImg
 );
-router.get('/:id', normalAuth, userController.getUser);
-router.put('/:id', normalAuth, userController.updateUser);
-router.delete('/:id', normalAuth, userController.deleteUser);
+router.get('/:TARGET_USER_ID', normalAuth, userController.getUser);
+router.put('/:TARGET_USER_ID', normalAuth, userController.updateUser);
+router.delete('/:TARGET_USER_ID', normalAuth, userController.deleteUser);
 
 module.exports = router;

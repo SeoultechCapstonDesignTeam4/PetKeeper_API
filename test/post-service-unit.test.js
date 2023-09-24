@@ -156,19 +156,19 @@ describe('Post Photo Service Unit Tests', function () {
   let key = 'test.jpg';
   const photo ={
     POST_ID: post_id,
-    USER_ID: user_id,
     PHOTO_PATH: key
   }
   describe('addPostPhoto', function () {
     let addedPostPhoto
     it('should add a new post photo', async function () {
-      addedPostPhoto = await postService.addPostPhoto(photo);
+      addedPostPhoto = await postService.addPostPhoto(photo,user_id);
       expect(addedPostPhoto).to.be.an('object');
       expect(addedPostPhoto.POST_ID).to.equal(2);
       expect(addedPostPhoto.PHOTO_PATH).to.equal('test.jpg');
+
     });
     after(async function () {
-      const deletedRows = await postService.deletePostPhoto(addedPostPhoto);
+      const deletedRows = await postService.deletePostPhoto(addedPostPhoto.PHOTO_ID);
       expect(deletedRows).to.equal(1);
     });
   });
@@ -190,26 +190,30 @@ describe('Post Photo Service Unit Tests', function () {
     });
   });
   describe('updatePhoto', function () {
-    let addedPhoto
+    let addedPhoto;
+    let user_id = 1;
+    let photo = {
+      POST_ID: 1,
+      PHOTO_PATH: 'test.jpg',
+    };
     before(async function () {
-      addedPhoto = await postService.addPostPhoto(photo);
+      addedPhoto = await postService.addPostPhoto(photo, user_id);
     });
     it('should update a photo', async function () {
-      const UpdatedPhoto ={
+      const UpdatedPhoto = {
         PHOTO_ID: addedPhoto.PHOTO_ID,
         POST_ID: addedPhoto.POST_ID,
         PHOTO_PATH: 'updated.jpg',
-      }
-      const updatedPhoto = await postService.updatePostPhoto(UpdatedPhoto);
+      };
+      const updatedPhoto = await postService.updatePostPhoto(
+        UpdatedPhoto,
+        UpdatedPhoto.PHOTO_ID
+      );
       expect(updatedPhoto).to.be.an('object');
       expect(updatedPhoto.PHOTO_PATH).to.equal('updated.jpg');
     });
     after(async function () {
-      const deletedPhoto={
-        POST_ID: addedPhoto.POST_ID,
-        USER_ID: addedPhoto.USER_ID,
-      }
-      const deletedRows = await postService.deletePostPhoto(deletedPhoto);
+      const deletedRows = await postService.deletePostPhoto(addedPhoto.PHOTO_ID);
       expect(deletedRows).to.equal(1);
     });
   });
@@ -223,7 +227,7 @@ describe('Post Photo Service Unit Tests', function () {
         POST_ID: addedPhoto.POST_ID,
         USER_ID: addedPhoto.USER_ID,
       }
-      const deletedRows = await postService.deletePostPhoto(deletedPhoto);
+      const deletedRows = await postService.deletePostPhoto(addedPhoto.PHOTO_ID);
       expect(deletedRows).to.equal(1);
     });
   });

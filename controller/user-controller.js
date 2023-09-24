@@ -2,34 +2,29 @@ const userService = require('../service/user-service');
 const bcrypt = require('bcrypt');
 const jwtUtil = require('../util/jwt-util');
 const p_user = require('../models').p_user;
-const {uploadImg,deleteImg} = require('../routes/middle/aws-s3');
-const sharp = require('sharp');
-// const {handleErrorResponse} = require('../util/error');
-// const {permissionCheck} = require('../util/error');
 const {handleErrorResponse,permissionCheck} = require('../util/error');
+const {uploadS3Img,deleteS3Img} = require('../util/s3-util');
 
+const dirName = 'user-profile';
 
 async function deleteUserImg(req, res) {
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  const { id } = req.params;
+  const { TARGET_USER_ID } = req.params;
 
   try {
-    const user = await userService.getUserById(id);
+    const user = await userService.getUserById(TARGET_USER_ID);
     
     if (permissionCheck(USER_AUTH, USER_ID, user.USER_ID)) {
       const target = user.USER_IMAGE.split('/')[3] + '/' + user.USER_IMAGE.split('/')[4];
 
       if (target !== 'user-profile/default-img') {
-        await deleteImg(target);
-        await userService.deleteUserImg(id);
+        await deleteS3Img(user.USER_IMAGE);
+        await userService.deleteUserImg(TARGET_USER_ID);
       }
-
       return res.status(200).json({
         success: true,
         message: 'Delete success'
       }).end();
-    } else {
-      throw new Error('Permission denied');
     }
   } catch (err) {
     handleErrorResponse(err, res);
@@ -38,35 +33,21 @@ async function deleteUserImg(req, res) {
 
 async function uploadUserImg(req, res) {
   const image = req.file;
-
-  if (!image) {
-    return res.status(400).json({
-      success: false,
-      message: 'No file provided'
-    }).end();
-  }
-
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  const { id } = req.params;
-  const key = 'user-profile/' + `${id}_${Date.now()}`;
-  const url = 'https://' + process.env.s3_bucket + '.s3.' + process.env.s3_region + '.amazonaws.com/' + key;
+  const { TARGET_USER_ID } = req.params;
 
   try {
-    const user = await userService.getUserById(id);
-
+    if (!image) {
+      throw new Error('File not found');
+    }
+    const user = await userService.getUserById(TARGET_USER_ID);
     if (permissionCheck(USER_AUTH, USER_ID, user.USER_ID)) {
       if (user.USER_IMAGE !== null) {
-        const target = user.USER_IMAGE.split('/')[3] + '/' + user.USER_IMAGE.split('/')[4];
-        await deleteImg(target);
+        await deleteS3Img(user.USER_IMAGE);
       }
-
-      const buffer = await sharp(image.buffer).resize({ width: 640, height: 640 }).withMetadata().toBuffer();
-      await uploadImg(buffer, key, image.mimetype);
-      await userService.uploadUserImg(id, url);
-
+      await uploadS3Img(image,dirName,TARGET_USER_ID);
+      await userService.uploadUserImg(TARGET_USER_ID, url);
       return res.status(200).json(url).end();
-    } else {
-      throw new Error('Permission denied');
     }
   } catch (err) {
     handleErrorResponse(err, res);
@@ -125,10 +106,10 @@ async function logout(req, res) {
 
 async function getUser(req, res) {
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  const { id } = req.params;
+  const { TARGET_USER_ID } = req.params;
   try {
-    if (permissionCheck(USER_AUTH, USER_ID, id)) {
-      const data = await userService.getUserById(id);
+    if (permissionCheck(USER_AUTH, USER_ID, TARGET_USER_ID)) {
+      const data = await userService.getUserById(TARGET_USER_ID);
       return res.status(200).json(data).end();
     } else {
       throw new Error('Permission denied');
@@ -169,7 +150,7 @@ async function addUser(req, res) {
 async function updateUser(req, res) {
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const user = req.body;
-  const {id} = req.params;
+  const {TARGET_USER_ID} = req.params;
 
   try {
     if (!user) {
@@ -178,9 +159,9 @@ async function updateUser(req, res) {
       throw new Error('Phone, email, or password is not found');
     }
 
-    if (permissionCheck(USER_AUTH, USER_ID, id)) {
+    if (permissionCheck(USER_AUTH, USER_ID, TARGET_USER_ID)) {
       user.USER_PASSWORD = bcrypt.hashSync(user.USER_PASSWORD, 10);
-      const data = await userService.updateUser(user,id);
+      const data = await userService.updateUser(user,TARGET_USER_ID);
       data.USER_PASSWORD = '********';
       return res.status(200).json(data).end();
     } else {
@@ -193,10 +174,10 @@ async function updateUser(req, res) {
 
 async function deleteUser(req, res) {
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  const { id } = req.params;
+  const { TARGET_USER_ID } = req.params;
   try {
-    if (permissionCheck(USER_AUTH, USER_ID, id)) {
-      const data = await userService.deleteUser(id);
+    if (permissionCheck(USER_AUTH, USER_ID, TARGET_USER_ID)) {
+      const data = await userService.deleteUser(TARGET_USER_ID);
       return res.status(200).json(data).end();
     } else {
       throw new Error('Permission denied');
