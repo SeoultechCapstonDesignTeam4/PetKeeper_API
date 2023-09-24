@@ -2,13 +2,19 @@ var express = require('express');
 var router = express.Router();
 const PostController = require('../controller/post-controller');
 const {normalAuth, adminAuth} = require('./middle/jwt');
-let PostImg = require('./middle/aws-s3').imageReq('Post-profile');
+let PostImg = require('./middle/aws-s3').imageReq('post-photo');
 
 router.get('/list', PostController.getPosts);
-router.post('/', normalAuth, PostImg, PostController.addPost);
-router.get('/getPostByUserId/:TARGET_USER_ID', PostController.getPostsByUserId);
+router.post('/', normalAuth, PostImg.single('image'), PostController.addPost);
+router.get('/getPostByUserId/:TARGET_USER_ID', normalAuth,PostController.getPostsByUserId);
 router.get('/:POST_ID', PostController.getPostById);
-router.put('/:POST_ID', normalAuth, PostImg, PostController.updatePost);
+router.put('/:POST_ID', normalAuth, PostImg.single('image'), PostController.updatePost);
 router.delete('/:POST_ID', normalAuth, PostController.deletePost);
-
+router.get('/getPostsByLike/:TARGET_USER_ID',normalAuth, PostController.getPostsByLike);
+router.get('/getPostsByComment/:TARGET_USER_ID',normalAuth, PostController.getPostsByComment);
+router.post('/like/:POST_ID', normalAuth, PostController.addLike);
+router.post('/comment/:POST_ID', normalAuth, PostController.addComment);
+router.delete('/comment/:COMMENT_ID', normalAuth, PostController.deleteComment);
+router.delete('/like/:POST_ID', normalAuth, PostController.deleteLike);
+router.put('/comment/:COMMENT_ID', normalAuth, PostController.updateComment);
 module.exports = router;

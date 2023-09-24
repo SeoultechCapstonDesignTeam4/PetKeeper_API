@@ -44,8 +44,10 @@ async function addPost(req, res) {
   const image = req.file;
   const { USER_ID } = res.locals.userInfo;
   let post = req.body;
-  post.POST_UPLOADED_DATE = getCurrentDate();
-
+  const now = getCurrentDate();
+  post.POST_UPLOADED_DATE = now[0];
+  post.POST_UPLOADED_TIME = now[1];
+  // return res.status(200).json(post).end();
   try {
       if (!post) throw new Error('No post');
       if (image) post.POST_IMAGE = await uploadS3Image(image, dirName, USER_ID);
@@ -54,7 +56,8 @@ async function addPost(req, res) {
       const photo = {
           POST_ID: data.POST_ID,
           POST_PATH: post.POST_IMAGE,
-          PHOTO_UPLOADED_DATE: post.POST_UPLOADED_DATE
+          PHOTO_UPLOADED_DATE: post.POST_UPLOADED_DATE,
+          PHOTO_UPLOADED_TIME: post.POST_UPLOADED_TIME
       };
       await postService.addPostPhoto(photo, USER_ID);
       return res.status(200).json(data).end();
@@ -67,6 +70,7 @@ async function updatePost(req, res) {
   const image = req.file;
   const { USER_AUTH, USER_ID } = res.locals.userInfo;
   const { POST_ID } = req.params;
+  let post = req.body;
 
   try {
       if (!post) throw new Error('No post');
@@ -101,7 +105,102 @@ async function deletePost(req, res) {
   }
 }
 
+async function addLike(req,res){
+  const {USER_ID} = res.locals.userInfo;
+  const {POST_ID} = req.params;
+  try{
+    const data = await postService.addLike(POST_ID,USER_ID);
+    return res.status(200).json(data).end();
+  }catch(err){
+    handleErrorResponse(err, res);
+  }
+}
 
+async function deleteLike(req,res){
+  const {USER_ID} = res.locals.userInfo;
+  const {POST_ID} = req.params;
+  try{
+    const data = await postService.deleteLike(POST_ID,USER_ID);
+    return res.status(200).json(data).end();
+  }catch(err){
+    handleErrorResponse(err, res);
+  }
+}
+
+async function getPostsByLike(req,res){
+  const {USER_AUTH,USER_ID} = res.locals.userInfo;
+  const {TARGET_USER_ID} = req.params;
+  try{
+    if(permissionCheck(USER_AUTH,USER_ID,TARGET_USER_ID)){
+      const data = await postService.getLikesByUserId(TARGET_USER_ID);
+      return res.status(200).json(data).end();
+    }
+  }catch(err){
+    handleErrorResponse(err, res);
+  }
+}
+
+async function addComment(req,res){
+  const {USER_ID} = res.locals.userInfo;
+  const {POST_ID} = req.params;
+  let comment = req.body;
+  let now = getCurrentDate();
+  comment.COMMENT_UPLOADED_DATE = now[0];
+  comment.COMMENT_UPLOADED_TIME = now[1];
+  try{
+    if(!comment){
+      throw new Error('comment not found');
+    }
+    const data = await postService.addComment(comment,USER_ID,POST_ID);
+    return res.status(200).json(data).end();
+  }catch(err){
+    handleErrorResponse(err, res);
+  }
+}
+
+async function deleteComment(req,res){
+  const {USER_AUTH,USER_ID} = res.locals.userInfo;
+  const {COMMENT_ID} = req.params;
+  try{
+    const commentInfo = await postService.getCommentById(COMMENT_ID);
+    if(permissionCheck(USER_AUTH,USER_ID,commentInfo.USER_ID)){
+      const data = await postService.deleteComment(COMMENT_ID);
+      return res.status(200).json(data).end();
+    }
+  }catch(err){
+    handleErrorResponse(err, res);
+  }
+}
+
+async function updateComment(req,res){
+  const {USER_AUTH,USER_ID} = res.locals.userInfo;
+  const {COMMENT_ID} = req.params;
+  let comment = req.body;
+  try{
+    if(!comment){
+      throw new Error('comment not found');
+    }
+    const commentInfo = await postService.getCommentById(COMMENT_ID);
+    if(permissionCheck(USER_AUTH,USER_ID,commentInfo.USER_ID)){
+      const data = await postService.updateComment(comment,COMMENT_ID);
+      return res.status(200).json(data).end();
+    }
+  }catch(err){
+    handleErrorResponse(err, res);
+  }
+}
+async function getPostsByComment(req,res){
+  const {USER_AUTH,USER_ID} = res.locals.userInfo;
+  const {TARGET_USER_ID} = req.params;
+  try{
+    if(permissionCheck(USER_AUTH,USER_ID,TARGET_USER_ID)){
+      const data = await postService.getCommentsByUserId(USER_ID);
+      return res.status(200).json(data).end();
+    }
+  }catch(err){
+    handleErrorResponse(err, res);
+  }
+}
 module.exports={
   getPosts,
   getPostById,
@@ -109,5 +208,12 @@ module.exports={
   addPost,
   updatePost,
   deletePost,
+  addLike,
+  deleteLike,
+  getPostsByLike,
+  addComment,
+  deleteComment,
+  updateComment,
+  getPostsByComment
 
 }

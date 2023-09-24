@@ -33,6 +33,7 @@ async function getPostsByUserId(USER_ID){
     include: [{
         model: p_user,
         as: 'USER',
+        attributes: ['USER_NAME','USER_IMAGE']
       },{
         model: p_post_photo,
         as: 'p_post_photos',
@@ -54,6 +55,7 @@ async function getPostById(POST_ID) {
     include: [{
       model: p_user,
       as: 'USER',
+      attributes: ['USER_NAME','USER_IMAGE']
     },{
       model: p_post_photo,
       as: 'p_post_photos',
@@ -146,7 +148,11 @@ async function getLikesByPostId(POST_ID) {
 }
 async function getLikesByUserId(USER_ID) {
   const likes = await p_post_like.findAll({
-    where: { USER_ID: USER_ID }
+    where: { USER_ID: USER_ID },
+    include:{
+      model: p_post,
+      as: 'POST'
+    }
   });
   return likes;
 }
@@ -212,13 +218,13 @@ async function updatePostPhoto(photo,PHOTO_ID) {
   );
   return photo
 }
-async function deletePostPhoto(PHOTO_ID) {
-  const existingPhoto = await p_post_photo.findOne({ where: { PHOTO_ID: PHOTO_ID } });
+async function deletePostPhoto(POST_ID) {
+  const existingPhoto = await p_post_photo.findOne({ where: { POST_ID: POST_ID } });
   if (!existingPhoto) {
     throw new Error('Photo not found');
   }
   const numOfAffectedRows = await p_post_photo.destroy({
-    where: { PHOTO_ID: PHOTO_ID },
+    where: { POST_ID: POST_ID },
   });
   return numOfAffectedRows;
 }
@@ -241,18 +247,41 @@ async function getCommentsByPostId(POST_ID) {
   return comments;
 }
 
+//내가 댓글 쓴 게시물들 검색
 async function getCommentsByUserId(USER_ID) {
   const comments = await p_post_comment.findAll({
     where: { USER_ID: USER_ID },
-    include:{
-      model: p_user,
-      as: 'USER',
-    }
+    include:[
+      {
+        model: p_user,
+        as: 'USER',
+        attributes: ['USER_NAME','USER_IMAGE']
+      },{
+        model: p_post,
+        as: 'POST',
+      }
+    ]
   });
   return comments;
 }
 
-async function addComment(comment,USER_ID) {
+async function getCommentById(COMMENT_ID) {
+  const comment = await p_post_comment.findOne({
+    where: { COMMENT_ID: COMMENT_ID },
+    include:{
+      model: p_user,
+      as: 'USER',
+      attributes: ['USER_NAME','USER_IMAGE'] 
+    }
+  });
+  if (!comment) {
+    throw new Error('Comment not found');
+  }
+  return comment;
+}
+
+async function addComment(comment,USER_ID,POST_ID) {
+  comment.POST_ID = POST_ID;
   comment.USER_ID = USER_ID;
   const createdComment = await p_post_comment.create(comment);
   if (!createdComment) {
@@ -306,6 +335,7 @@ module.exports ={
 
   getCommentsByPostId,
   getCommentsByUserId,
+  getCommentById,
   addComment,
   updateComment,
   deleteComment,

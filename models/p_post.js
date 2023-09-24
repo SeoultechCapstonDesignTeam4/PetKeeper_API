@@ -28,7 +28,11 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     POST_UPLOADED_DATE: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+    POST_UPLOADED_TIME: {
+      type: DataTypes.TIME,
       allowNull: true
     }
   }, {

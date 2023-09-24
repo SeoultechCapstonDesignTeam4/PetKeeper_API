@@ -41,13 +41,14 @@ async function uploadImg(buffer, key,mimetype) {
 }
 
 async function deleteImg(key){
+  const command = new DeleteObjectCommand({
+    Bucket: bucket,
+    Key: key
+  })
   try{
-    const params = {
-      Bucket: bucket,
-      Key: key
-    }
-    await s3.send(new DeleteObjectCommand(params));
+    const response = await s3.send(command);
   }catch(err){
+    console.log(err.message);
     throw err;
   }
 }

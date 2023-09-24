@@ -41,7 +41,11 @@ function getCurrentDate() {
   const dd = String(today.getUTCDate()).padStart(2, '0');
   const hh = String(today.getUTCHours()).padStart(2, '0');
   const min = String(today.getUTCMinutes()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+  const ss = String(today.getUTCSeconds()).padStart(2, '0');
+  const list = [];
+  list.push(`${yyyy}-${mm}-${dd}`);
+  list.push(`${hh}:${min}:${ss}`);
+  return list;
 }
 
 module.exports = {

@@ -28,9 +28,12 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     COMMENT_UPLOADED_DATE: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+    COMMENT_UPLOADED_TIME: {
+      type: DataTypes.TIME,
+      allowNull: true
     }
   }, {
     sequelize,

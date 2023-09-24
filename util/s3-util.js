@@ -14,7 +14,8 @@ async function uploadS3Image(image, dirName,USER_ID) {
 }
 
 async function deleteS3Image(imageUrl) {
-  const target = imageUrl.split('/')[3] + "/" + imageUrl.split('/')[4];
+  const parts = imageUrl.split('/');
+  const target = parts[parts.length - 2] + "/" + parts[parts.length - 1];
   await deleteImg(target);
 }
 
