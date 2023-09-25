@@ -2,7 +2,7 @@ const userService = require('../service/user-service');
 const bcrypt = require('bcrypt');
 const jwtUtil = require('../util/jwt-util');
 const p_user = require('../models').p_user;
-const {handleErrorResponse,permissionCheck} = require('../util/error');
+const {handleErrorResponse,permissionCheck,getCurrentDate } = require('../util/error');
 const {uploadS3Img,deleteS3Img} = require('../util/s3-util');
 
 const dirName = 'user-profile';
@@ -89,7 +89,7 @@ async function generateToken(user) {
     name: user.USER_NAME
   };
 
-  const token = await jwtUtil.sign(data);
+  const token =    await jwtUtil.sign(data);
   return token;
 }
 
@@ -130,14 +130,15 @@ async function getUsers(req, res) {
 
 async function addUser(req, res) {
   const user = req.body;
-
+  const now = getCurrentDate();
   try {
     if (!user) {
       throw new Error('User data not found');
     } else if (!user.USER_PHONE || !user.USER_EMAIL || !user.USER_PASSWORD) {
       throw new Error('Phone, email, or password is not found');
     }
-
+    user.USER_DATE = now[0];
+    user.USER_TIME = now[1];
     user.USER_PASSWORD = bcrypt.hashSync(user.USER_PASSWORD, 10);
 
     const data = await userService.addUser(user);

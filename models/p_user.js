@@ -55,6 +55,14 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       defaultValue: 0
     },
+    USER_DATE: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+    USER_TIME: {
+      type: DataTypes.TIME,
+      allowNull: true
+    },
     USER_OAUTH_ID: {
       type: DataTypes.CHAR(200),
       allowNull: true
