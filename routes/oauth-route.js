@@ -24,7 +24,7 @@ passport.use(new KakaoStrategy({
       email: profile._json.kakao_account.email,
       name: profile.displayName,
   }, JWT_SECRET, { expiresIn: '1d' });
-  return done(null, { profile, token });
+  return done(null, { profile, token, accessToken });
   }catch(err){
     console.error("Error in KakaoStrategy callback:", err);
     return done(err);
@@ -49,16 +49,19 @@ passport.use(new NaverStrategy({
       console.error("Error in NaverStrategy callback:", err);
       return cb(err);
     }
-    return cb(null, { profile, token });
+    return cb(null, { profile, token, accessToken });
   }
 ))
+
+
 
 passport.use(new GoogleStrategy({
   clientID: GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
   callbackURL: GOOGLE_REDIRECT_URL,
   passReqToCallback: true  
-}, function(req, accessToken, refreshToken, profile, cb) {
+}, async function(req, accessToken, refreshToken, profile, cb) {
+  console.log(accessToken);
   let token;
   try{
       token = jwt.sign({
@@ -70,7 +73,7 @@ passport.use(new GoogleStrategy({
       console.error("Error in GoogleStrategy callback:", err);
       return cb(err);
   }
-  return cb(null, { profile, token });
+  return cb(null, { profile, token, accessToken });
 }));
 
 router.get('/naver', passport.authenticate('naver'));
@@ -83,20 +86,19 @@ router.get('/kakao', passport.authenticate('kakao'));
 router.get('/kakao/callback',
   passport.authenticate('kakao', { failureRedirect: '/login',session: false }),
   function(req, res) {
-    return res.status(200).json({ token: req.user.token });
+    return res.status(200).json({ token: req.user.accessToken });
   }
 );
 router.get('/naver/callback',
   passport.authenticate('naver', { failureRedirect: '/login',session: false}),
   function(req, res){
-    return res.status(200).json({ token: req.user.token });
+    return res.status(200).json({ token: req.user.accessToken });
   });
 
 router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/login', session: false}),
   function(req, res) {
-    return res.status(200).json({ token: req.user.token });
+    return res.status(200).json({ token: req.user.accessToken });
 });
-
 
 module.exports = router;
