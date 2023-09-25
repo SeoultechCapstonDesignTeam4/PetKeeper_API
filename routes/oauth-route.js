@@ -10,7 +10,38 @@ const router = express.Router();
 const { 
   NAVER_CLIENT_ID, NAVER_CLIENT_SECRET,NAVER_REDIRECT_URL,
   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL,
+  KAKAO_CLIENT_ID, KAKAO_REDIRECT_URL,
   JWT_SECRET } = process.env;
+
+passport.use(new KakaoStrategy({
+  clientID: KAKAO_CLIENT_ID,
+  callbackURL: KAKAO_REDIRECT_URL,
+}, function(accessToken, refreshToken, profile, done) {
+  console.log(profile);
+  try{
+    const token = jwt.sign({
+      user_id: profile.id,
+      email: profile._json.kakao_account.email,
+      name: profile.displayName,
+  }, JWT_SECRET, { expiresIn: '1d' });
+  return done(null, { profile, token });
+  }catch(err){
+    console.error("Error in KakaoStrategy callback:", err);
+    return done(err);
+  }
+}));
+router.get('/kakao', passport.authenticate('kakao'));
+
+router.get('/kakao/callback',(req,res,next)=>{
+  console.log('before');
+  next();
+},
+  passport.authenticate('kakao', { failureRedirect: '/login',session: false }),
+  function(req, res) {
+    console.log('after');
+    return res.status(200).json({ token: req.user.token });
+  }
+);
 
 passport.use(new NaverStrategy({
   clientID: NAVER_CLIENT_ID,
