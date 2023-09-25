@@ -15,20 +15,14 @@ router.get('/google',async function(req,res){
     const {data} = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
       headers: {Authorization: `Bearer ${accesstoken}`}
     });
-    // const user ={
-    //   USER_EMAIL:data.email,
-    //   USER_NAME:data.name,
-    //   USER_IMAGE:data.picture,
-    //   USER_AUTH_ID:data.sub,
-    //   USER_AUTH_PROVIDER: 'google'
-    // }
-
-    // const userCheck = await p_user.findOne({where:{USER_AUTH_ID:data.sub}});
-    // if(!userCheck){
-    //   await p_user.create(user);
-    // }
-
-    return res.json(data);
+    const result = {
+      USER_OAUTH_ID: data.sub,
+      USER_EMAIL: data.email,
+      USER_NAME: data.name,
+      USER_IMAGE: data.picture,
+      USER_OAUTH_PROVIDED: 'google',
+    }
+    return res.json(result);
   }catch(err){
     handleErrorResponse(err,res);
   }
@@ -38,10 +32,17 @@ router.get('/naver',async function(req,res){
   const {accesstoken} = req.headers;
   try{
     if(!accesstoken) throw new Error('token not found');
-    const response = await axios.get('https://openapi.naver.com/v1/nid/me', {
+    const {data} = await axios.get('https://openapi.naver.com/v1/nid/me', {
       headers: {Authorization: `Bearer ${accesstoken}`}
     });
-    return res.json(response.data);
+    const result = {
+      USER_OAUTH_ID: data.response.id,
+      USER_EMAIL: data.response.email,
+      USER_NAME: data.response.name,
+      USER_IMAGE: data.response.profile_image,
+      USER_OAUTH_PROVIDED: 'naver',
+    }
+    return res.json(result);
   }catch(err){
     handleErrorResponse(err,res);
   }
@@ -51,10 +52,17 @@ router.get('/kakao',async function(req,res){
   const {accesstoken} = req.headers;
   try{
     if(!accesstoken) throw new Error('token not found');
-    const response = await axios.get('https://kapi.kakao.com/v1/user/access_token_info', {
+    const {data} = await axios.get('https://kapi.kakao.com/v2/user/me', {
       headers: {Authorization: `Bearer ${accesstoken}`}
     });
-    return res.json(response.data);
+    const result ={
+      USER_OAUTH_ID: data.id,
+      USER_EMAIL: data.kakao_account.email,
+      USER_NAME: data.properties.nickname,
+      USER_IMAGE: data.properties.profile_image,
+      USER_OAUTH_PROVIDED: 'kakao',
+    }
+    return res.json(result);
   }catch(err){
     handleErrorResponse(err,res);
   }

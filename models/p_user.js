@@ -55,11 +55,11 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       defaultValue: 0
     },
-    USER_AUTH_ID: {
+    USER_OAUTH_ID: {
       type: DataTypes.CHAR(200),
       allowNull: true
     },
-    USER_AUTH_PROVIDER: {
+    USER_OAUTH_PROVIDER: {
       type: DataTypes.CHAR(20),
       allowNull: true
     }
