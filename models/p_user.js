@@ -54,6 +54,14 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       allowNull: true,
       defaultValue: 0
+    },
+    USER_OAUTH_ID: {
+      type: DataTypes.CHAR(200),
+      allowNull: true
+    },
+    USER_OAUTH_PROVIDER: {
+      type: DataTypes.CHAR(20),
+      allowNull: true
     }
   }, {
     sequelize,

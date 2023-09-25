@@ -1,13 +1,13 @@
 const jwt = require('jsonwebtoken');
 const options ={
-  expiresIn: process.env.jwtExpire
+  expiresIn: process.env.JWT_EXPIRE
 };
 
 async function sign(data){
-  return token = await jwt.sign(data,process.env.jwtSecret,options);
+  return token = await jwt.sign(data,process.env.JWT_SECRET,options);
 }
 async function verify(token){
-  return decoded = await jwt.verify(token,process.env.jwtSecret);
+  return decoded = await jwt.verify(token,process.env.JWT_SECRET);
 }
 
 module.exports={
