@@ -12,6 +12,7 @@ const usersRouter = require('./routes/user-route');
 const petRouter = require('./routes/pet-route');
 const diagRouter = require('./routes/diag-route');
 const postRouter = require('./routes/post-route');
+const oauthRouter = require('./routes/oauth-route');
 // const app = express();
 const sequelize = require('./models');
 // Express 애플리케이션을 초기화합니다.
@@ -33,6 +34,7 @@ app.use('/user', usersRouter);
 app.use('/pet', petRouter);
 app.use('/diag', diagRouter);
 app.use('/post', postRouter);
+app.use('/auth', oauthRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
