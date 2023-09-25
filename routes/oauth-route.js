@@ -30,18 +30,6 @@ passport.use(new KakaoStrategy({
     return done(err);
   }
 }));
-router.get('/kakao', passport.authenticate('kakao'));
-
-router.get('/kakao/callback',(req,res,next)=>{
-  console.log('before');
-  next();
-},
-  passport.authenticate('kakao', { failureRedirect: '/login',session: false }),
-  function(req, res) {
-    console.log('after');
-    return res.status(200).json({ token: req.user.token });
-  }
-);
 
 passport.use(new NaverStrategy({
   clientID: NAVER_CLIENT_ID,
@@ -65,14 +53,6 @@ passport.use(new NaverStrategy({
   }
 ))
 
-router.get('/naver', passport.authenticate('naver'));
-
-router.get('/naver/callback',passport.authenticate('naver', {
-failureRedirect: '/login',session: false
-}), function(req, res){
-  return res.status(200).json({ token: req.user.token });
-});
-
 passport.use(new GoogleStrategy({
   clientID: GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
@@ -93,19 +73,30 @@ passport.use(new GoogleStrategy({
   return cb(null, { profile, token });
 }));
 
+router.get('/naver', passport.authenticate('naver'));
 
-// 세션을 사용하지 않기 위해 session 옵션을 false로 설정합니다.
-router.get('/google', passport.authenticate('google', { 
-    scope: ['profile', 'email'],
-    session: false 
-}));
+
+router.get('/google', passport.authenticate('google',{scope: ['profile', 'email'],session: false}));
+
+router.get('/kakao', passport.authenticate('kakao'));
+
+router.get('/kakao/callback',
+  passport.authenticate('kakao', { failureRedirect: '/login',session: false }),
+  function(req, res) {
+    return res.status(200).json({ token: req.user.token });
+  }
+);
+router.get('/naver/callback',
+  passport.authenticate('naver', { failureRedirect: '/login',session: false}),
+  function(req, res){
+    return res.status(200).json({ token: req.user.token });
+  });
 
 router.get('/google/callback',
-passport.authenticate('google', {
-  failureRedirect: '/login', session: false }),
-function(req, res) {
-  return res.status(200).json({ token: req.user.token });
-
+  passport.authenticate('google', { failureRedirect: '/login', session: false}),
+  function(req, res) {
+    return res.status(200).json({ token: req.user.token });
 });
+
 
 module.exports = router;
