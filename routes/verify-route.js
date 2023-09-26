@@ -22,7 +22,8 @@ async function afterOauth(result) {
 }
 
 async function handleOAuthService(req, res, serviceInfo) {
-    const { accesstoken } = req.headers;
+    // const { accesstoken } = req.headers;
+    const accesstoken = req.headers['authorization'];
     try {
         const now = getCurrentDate();
         if (!accesstoken) throw new Error('token not found');
