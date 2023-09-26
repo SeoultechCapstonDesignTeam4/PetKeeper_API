@@ -26,7 +26,7 @@ function handleErrorResponse(err, res) {
  * @returns {boolean} - True if the user has the necessary permissions, otherwise throws an error.
  */
 function permissionCheck(USER_AUTH, USER_ID, id) {
-  if (USER_AUTH === 'admin' || USER_ID === id) {
+  if (USER_AUTH == 'admin' || USER_ID == id) {
     return true;
   }
   throw new Error('permission denied');

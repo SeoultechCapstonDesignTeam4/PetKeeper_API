@@ -11,6 +11,7 @@ async function getUsers() {
       model: p_pet,
       as: 'p_pets',
       where: { IS_DELETED: 0 },
+      required: false,
       include:[
         {
           model: p_pet_vaccination,
@@ -72,6 +73,7 @@ async function getUserById(id) {
       model: p_pet,
       as: 'p_pets',
       where: { IS_DELETED: 0 },
+      required: false,
       include:[
         {
           model: p_pet_vaccination,
@@ -84,8 +86,7 @@ async function getUserById(id) {
       attributes: { exclude: ['createdAt', 'updatedAt', 'IS_DELETED'] }
     }
   });
-  
-  if (!user) {
+  if(!user){
     throw new Error('User not found');
   }
   
@@ -102,6 +103,7 @@ async function getUserByEmail(email) {
       model: p_pet,
       as: 'p_pets',
       where: { IS_DELETED: 0 },
+      required: false,
       include:[
         {
           model: p_pet_vaccination,
@@ -131,6 +133,7 @@ async function getUserByPhone(phone) {
       model: p_pet,
       as: 'p_pets',
       where: { IS_DELETED: 0 },
+      required: false,
       include:[
         {
           model: p_pet_vaccination,
@@ -162,7 +165,8 @@ async function getUserByToken(token) {
     include: {
       model: p_pet,
       attributes: { exclude: ['createdAt', 'updatedAt', 'IS_DELETED'] },
-      as: 'p_pets'
+      as: 'p_pets',
+      required: false,
     }
   });
   

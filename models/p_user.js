@@ -8,6 +8,10 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       comment: "사용자 고유 ID"
     },
+    USER_OAUTH_ID: {
+      type: DataTypes.CHAR(200),
+      allowNull: true
+    },
     USER_EMAIL: {
       type: DataTypes.CHAR(30),
       allowNull: true,
@@ -50,11 +54,6 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: "normal",
       comment: "사용자 권한"
     },
-    IS_DELETED: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-      defaultValue: 0
-    },
     USER_DATE: {
       type: DataTypes.DATEONLY,
       allowNull: true
@@ -63,9 +62,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TIME,
       allowNull: true
     },
-    USER_OAUTH_ID: {
-      type: DataTypes.CHAR(200),
-      allowNull: true
+    IS_DELETED: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: 0
     },
     USER_OAUTH_PROVIDER: {
       type: DataTypes.CHAR(20),
@@ -74,7 +74,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'p_user',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",

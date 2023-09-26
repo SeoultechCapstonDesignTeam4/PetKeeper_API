@@ -106,7 +106,9 @@ async function logout(req, res) {
 
 async function getUser(req, res) {
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
+  
   const { TARGET_USER_ID } = req.params;
+  console.log(USER_AUTH, USER_ID, TARGET_USER_ID);
   try {
     if (permissionCheck(USER_AUTH, USER_ID, TARGET_USER_ID)) {
       const data = await userService.getUserById(TARGET_USER_ID);
