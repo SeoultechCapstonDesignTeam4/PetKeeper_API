@@ -142,9 +142,9 @@ async function addUser(req, res) {
     user.USER_DATE = now[0];
     user.USER_TIME = now[1];
     user.USER_PASSWORD = bcrypt.hashSync(user.USER_PASSWORD, 10);
-
     const data = await userService.addUser(user);
-    return res.json(data);
+    data.USER_PASSWORD = '********';
+    return res.status(200).json(data);
   } catch (err) {
     handleErrorResponse(err, res);
   }
