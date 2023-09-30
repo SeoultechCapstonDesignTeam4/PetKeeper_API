@@ -26,5 +26,8 @@ const sendEmail = (to, subject, text) => {
   });
 }
 
+module.exports={
+  sendEmail
+}
 // // 예제로 이메일 보내기
 // sendEmail('hchbae1001@gmail.com', 'Nodemailer Test', '노드 패키지 nodemailer를 이용해 보낸 이메일임');

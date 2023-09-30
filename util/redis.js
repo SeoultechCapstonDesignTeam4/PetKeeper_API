@@ -1,10 +1,16 @@
 const redis = require('redis');
-const jwt = require('./jwt-util');
-const client = redis.createClient();
+const client = redis.createClient(6379,"127.0.0.1");
+client.connect();
+const jsonwebtoken = require('jsonwebtoken');
+const secret = process.env.JWT_SECRET;
+
 const crypto = require('crypto');
 
+client.on('connect', () => {  
+  console.info('Redis connected!');
+});
 client.on('error', (err) => {
-    console.error('Redis error:', err);
+  console.error('Redis error:', err);
 });
 
 function generateRandomString(length) {
@@ -12,7 +18,8 @@ function generateRandomString(length) {
 }
 
 function createResetToken(data) {
-  const token = jwt.sign(data)
+  client.del(`reset:${data.USER_EMAIL}`);
+  const token = jsonwebtoken.sign(data, secret, { expiresIn: '1h' });
   client.set(`reset:${data.USER_EMAIL}`, token, 'EX', 3600); // 1시간 저장
   return token;
 }
@@ -28,7 +35,7 @@ async function verifyResetToken(email, token, callback) {
             return;
         }
         if (reply === token) {
-          const data = jwt.verify(token);
+          const data = jsonwebtoken.verify(token,secret);
           deleteResetToken(email);
           return data;
         } else {

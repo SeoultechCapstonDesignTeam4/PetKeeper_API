@@ -6,4 +6,4 @@ dist/
 env/development.env
 coverage/*
 .nyc_output/*
-
+dump.rdb
