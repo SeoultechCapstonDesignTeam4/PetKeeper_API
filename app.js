@@ -38,10 +38,6 @@ app.use('/post', postRouter);
 app.use('/auth', oauthRouter);
 app.use('/verify', verifyRouter);
 
-app.use(morgan('combined', {
-  skip: function (req, res) { return req.path === '/'; }
-}));
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

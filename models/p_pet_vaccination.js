@@ -19,12 +19,16 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.CHAR(40),
       allowNull: true
     },
+    PET_VACCINATION_PERIOD: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
     PET_VACCINATION_DATE: {
       type: DataTypes.DATEONLY,
       allowNull: true
     },
-    PET_VACCINATION_PERIOD: {
-      type: DataTypes.INTEGER,
+    PET_VACCINATION_TIME: {
+      type: DataTypes.TIME,
       allowNull: true
     }
   }, {

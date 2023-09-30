@@ -48,6 +48,14 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: "https:\/\/petkeeper.s3.ap-northeast-2.amazonaws.com\/pet-profile\/default-img",
       comment: "애완동물 프로필사진"
     },
+    PET_DATE: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+    PET_TIME: {
+      type: DataTypes.TIME,
+      allowNull: true
+    },
     IS_DELETED: {
       type: DataTypes.TINYINT,
       allowNull: true,
@@ -56,7 +64,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'p_pet',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",

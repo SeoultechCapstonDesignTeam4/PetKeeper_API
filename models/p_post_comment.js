@@ -27,11 +27,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.CHAR(200),
       allowNull: true
     },
-    COMMENT_UPLOADED_DATE: {
+    COMMENT_DATE: {
       type: DataTypes.DATEONLY,
       allowNull: true
     },
-    COMMENT_UPLOADED_TIME: {
+    COMMENT_TIME: {
       type: DataTypes.TIME,
       allowNull: true
     }

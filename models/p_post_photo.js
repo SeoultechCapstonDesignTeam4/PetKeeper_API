@@ -27,8 +27,12 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    PHOTO_UPLOADED_DATE: {
-      type: DataTypes.DATE,
+    PHOTO_DATE: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+    PHOTO_TIME: {
+      type: DataTypes.TIME,
       allowNull: true
     }
   }, {

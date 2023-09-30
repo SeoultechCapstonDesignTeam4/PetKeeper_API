@@ -27,11 +27,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.CHAR(255),
       allowNull: true
     },
-    POST_UPLOADED_DATE: {
+    POST_DATE: {
       type: DataTypes.DATEONLY,
       allowNull: true
     },
-    POST_UPLOADED_TIME: {
+    POST_TIME: {
       type: DataTypes.TIME,
       allowNull: true
     }

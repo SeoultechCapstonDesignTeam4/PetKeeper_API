@@ -1,6 +1,6 @@
 const petService = require('../service/pet-service');
 const {uploadS3Img,deleteS3Img, uploadS3Image, deleteS3Image} = require('../util/s3-util');
-const {permissionCheck,handleErrorResponse} = require('../util/error');
+const {permissionCheck,handleErrorResponse, getCurrentDate} = require('../util/error');
 
 const dirName = 'pet-profile';
 
@@ -73,6 +73,9 @@ async function uploadPetImg(req,res){
 async function addPet(req,res){
   const {USER_ID} = res.locals.userInfo;
   let pet = req.body;
+  const now = getCurrentDate();
+  pet.PET_DATE = now[0];
+  pet.PET_TIME = now[1];
   try{
     if(!pet){
       throw new Error('No pet');
@@ -119,6 +122,9 @@ async function addPetVaccination(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
   let vaccination = req.body;
   const {PET_ID} = req.params;
+  const now = getCurrentDate();
+  vaccination.VACCINATION_DATE = now[0];
+  vaccination.VACCINATION_TIME = now[1];
   try{
     if(!vaccination){
       throw new Error('No vaccination');
