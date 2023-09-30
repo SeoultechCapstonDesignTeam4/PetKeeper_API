@@ -38,6 +38,17 @@ app.use('/post', postRouter);
 app.use('/auth', oauthRouter);
 app.use('/verify', verifyRouter);
 
+const rateLimit = require("express-rate-limit");
+// 앱 또는 라우터 레벨에서 제한 설정
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,  // 15분 동안
+  max: 100,  // 각 IP 주소에서 15분 동안 최대 100개의 요청을 허용
+  message: "Too many requests from this IP, please try again later"  // 제한이 초과될 경우의 응답 메시지
+});
+
+//  이 미들웨어를 전체 앱에 적용
+app.use(limiter);
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

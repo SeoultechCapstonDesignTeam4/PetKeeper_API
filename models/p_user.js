@@ -72,7 +72,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     USER_EMAIL_VERIFIED: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN,
       allowNull: true,
       defaultValue: 0
     }

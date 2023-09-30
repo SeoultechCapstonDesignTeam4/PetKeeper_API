@@ -36,6 +36,7 @@ async function handleOAuthService(req, res, serviceInfo) {
         const mappedData = serviceInfo.mapData(data);
         mappedData.USER_DATE = now[0];
         mappedData.USER_TIME = now[1];
+        mappedData.USER_EMAIL_VERIFIED = 1;
         console.log(mappedData);
         const token = await afterOauth(mappedData);
         res.setHeader('Authorization', `Bearer ${token}`);
