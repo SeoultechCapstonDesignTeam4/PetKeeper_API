@@ -4,7 +4,8 @@ const jwtUtil = require('../util/jwt-util');
 const p_user = require('../models').p_user;
 const {handleErrorResponse,permissionCheck,getCurrentDate } = require('../util/error');
 const {uploadS3Img,deleteS3Img} = require('../util/s3-util');
-
+const {sendEmail} = require('../util/mail-js');
+const {createResetToken,verifyResetToken,deleteResetToken, generateRandomString} = require('../util/redis');
 const dirName = 'user-profile';
 
 async function deleteUserImg(req, res) {
@@ -89,10 +90,45 @@ async function generateToken(user) {
     name: user.USER_NAME
   };
 
-  const token =    await jwtUtil.sign(data);
+  const token = await jwtUtil.sign(data);
   return token;
 }
 
+async function forgetPassword(req, res) {
+  const { USER_EMAIL } = req.body;
+  try {
+    if (!USER_EMAIL) throw new Error('Email is not found');
+    const check = await userService.getUserByEmail(USER_EMAIL);
+    const data = {
+      USER_ID: check.USER_ID,
+      USER_EMAIL: check.USER_EMAIL
+    };
+    const token = await createResetToken(data);
+    await sendEmail(USER_EMAIL, `[비밀번호 리셋]${USER_EMAIL}`, `https://petkeeper.co.kr/user/forget/callback?email=${USER_EMAIL}&token=${token}`);
+    return res.status(200).json({ message: '비밀번호 리셋 이메일이 발송되었습니다. 내용에 나와있는 URL을 클릭해주세요' }).end();
+  } catch (err) {
+    handleErrorResponse(err, res);
+  }
+}
+
+async function verifyToken(req,res){
+  const {email, token} = req.params;
+  try{
+    const user = await verifyResetToken(email, token);
+    const newPassword = generateRandomString(10);
+    user.USER_PASSWORD = bcrypt.hashSync(newPassword, 10);
+    user.USER_ACCESSTOKEN = null;
+    await userService.updateUser(user,user.USER_ID);
+    const result = {
+      USER_EMAIL: email,
+      USER_PASSWORD: newPassword,
+      message: '비밀번호가 리셋되었습니다. 다시 로그인해주세요'
+    }
+    return res.status(200).json(result).end();
+  }catch(err){
+    handleErrorResponse(err,res);
+  }
+}
 
 async function logout(req, res) {
   const {USER_EMAIL} = res.locals.userInfo;
@@ -202,4 +238,6 @@ module.exports ={
   deleteUser,
   uploadUserImg,
   deleteUserImg,
+  forgetPassword,
+  verifyToken
 }

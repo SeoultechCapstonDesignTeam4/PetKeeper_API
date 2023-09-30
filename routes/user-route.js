@@ -22,5 +22,7 @@ router.delete('/user-img/:TARGET_USER_ID',
 router.get('/:TARGET_USER_ID', normalAuth, userController.getUser);
 router.put('/:TARGET_USER_ID', normalAuth, userController.updateUser);
 router.delete('/:TARGET_USER_ID', normalAuth, userController.deleteUser);
+router.post('/forget', userController.forgetPassword);
+router.get('/forget/callback', userController.verifyToken);
 
 module.exports = router;

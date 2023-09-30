@@ -70,6 +70,11 @@ module.exports = function(sequelize, DataTypes) {
     USER_OAUTH_PROVIDER: {
       type: DataTypes.CHAR(20),
       allowNull: true
+    },
+    USER_EMAIL_VERIFIED: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 0
     }
   }, {
     sequelize,

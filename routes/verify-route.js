@@ -38,6 +38,7 @@ async function handleOAuthService(req, res, serviceInfo) {
         mappedData.USER_TIME = now[1];
         console.log(mappedData);
         const token = await afterOauth(mappedData);
+        res.setHeader('Authorization', `Bearer ${token}`);
         return res.status(200).json({ token: token });
     } catch (err) {
         handleErrorResponse(err, res);
