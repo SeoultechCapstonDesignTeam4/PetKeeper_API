@@ -222,16 +222,16 @@ async function updateUser(user,id) {
     throw new Error('Email already exists');
   }
   
-  const checkPhone = await p_user.findOne({
-    where: {
-      USER_PHONE: user.USER_PHONE,
-      USER_ID: { [Op.not]: id }
-    }
-  });
+  // const checkPhone = await p_user.findOne({
+  //   where: {
+  //     USER_PHONE: user.USER_PHONE,
+  //     USER_ID: { [Op.not]: id }
+  //   }
+  // });
   
-  if (checkPhone) {
-    throw new Error('Phone already exists');
-  }
+  // if (checkPhone) {
+  //   throw new Error('Phone already exists');
+  // }
   
   const updatedUser = await p_user.update(user, {
     where: { USER_ID: id }

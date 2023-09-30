@@ -112,7 +112,7 @@ async function forgetPassword(req, res) {
 }
 
 async function verifyToken(req,res){
-  const {email, token} = req.params;
+  const {email, token} = req.query;
   try{
     const user = await verifyResetToken(email, token);
     const newPassword = generateRandomString(10);

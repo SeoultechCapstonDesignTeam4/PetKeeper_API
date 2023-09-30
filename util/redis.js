@@ -24,25 +24,41 @@ function createResetToken(data) {
   return token;
 }
 
-function deleteResetToken(email) {
+async function deleteResetToken(email) {
   client.del(`reset:${email}`);
 }
 
-async function verifyResetToken(email, token, callback) {
-    await client.get(`reset:${email}`, function (err, reply) {
-        if (err) {
-            callback(err, null);
-            return;
-        }
-        if (reply === token) {
-          const data = jsonwebtoken.verify(token,secret);
-          deleteResetToken(email);
-          return data;
-        } else {
-          callback(new Error('Token does not match'), null);
-        }
+function getValueFromRedis(key) {
+  console.log('Fetching value from Redis for key:', key); // 로그 추가
+  return new Promise((resolve, reject) => {
+    client.get(key, (err, result) => {
+      if (err) {
+        console.error('Error fetching value:', err); // 로그 추가
+        reject(err);
+      } else {
+        console.log('Fetched value:', result); // 로그 추가
+        resolve(result);
+      }
     });
+  });
 }
+
+
+async function verifyResetToken(email, token) {
+  try {
+    const value = await client.get(`reset:${email}`);
+    if (value === token) {
+      const decoded = jsonwebtoken.verify(token, secret);
+      return decoded;
+    } else {
+      throw new Error('Token does not match');
+    }
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+
 
 
 

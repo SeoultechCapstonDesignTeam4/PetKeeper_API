@@ -1,9 +1,15 @@
-const crypto = require('crypto');
+const redis = require('redis');
+const client = redis.createClient();
+client.connect();
 
-function generateRandomString(length) {
-    return crypto.randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length);
-}
+client.on('connect', () => {  
+  console.info('Redis connected!');
 
-// 예시 사용법:
-const newPassword = generateRandomString(10);  // 10자리의 임시 비밀번호
-console.log(newPassword);
+});
+client.on('error', (err) => {
+  console.error('Redis error:', err);
+});
+
+client.get('reset:hchbae1001@gmail.com', (err, result) => {
+    console.log(result);
+})
