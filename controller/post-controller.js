@@ -45,8 +45,8 @@ async function addPost(req, res) {
   const { USER_ID } = res.locals.userInfo;
   let post = req.body;
   const now = getCurrentDate();
-  post.POST_UPLOADED_DATE = now[0];
-  post.POST_UPLOADED_TIME = now[1];
+  post.POST_DATE = now[0];
+  post.POST_TIME = now[1];
   // return res.status(200).json(post).end();
   try {
       if (!post) throw new Error('No post');
@@ -56,8 +56,8 @@ async function addPost(req, res) {
       const photo = {
           POST_ID: data.POST_ID,
           POST_PATH: post.POST_IMAGE,
-          PHOTO_UPLOADED_DATE: post.POST_UPLOADED_DATE,
-          PHOTO_UPLOADED_TIME: post.POST_UPLOADED_TIME
+          PHOTO_DATE: post.POST_DATE,
+          PHOTO_TIME: post.POST_TIME
       };
       await postService.addPostPhoto(photo, USER_ID);
       return res.status(200).json(data).end();
@@ -145,8 +145,8 @@ async function addComment(req,res){
   const {POST_ID} = req.params;
   let comment = req.body;
   let now = getCurrentDate();
-  comment.COMMENT_UPLOADED_DATE = now[0];
-  comment.COMMENT_UPLOADED_TIME = now[1];
+  comment.COMMENT_DATE = now[0];
+  comment.COMMENT_TIME = now[1];
   try{
     if(!comment){
       throw new Error('comment not found');
