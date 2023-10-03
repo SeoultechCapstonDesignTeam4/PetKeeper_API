@@ -118,7 +118,9 @@ async function verifyToken(req,res){
     const newPassword = generateRandomString(10);
     user.USER_PASSWORD = bcrypt.hashSync(newPassword, 10);
     user.USER_ACCESSTOKEN = null;
-    await userService.updateUser(user,user.USER_ID);
+    await userService.updateUser(user,user.USER_ID).then(()=>{
+      deleteResetToken(email);
+    });
     const result = {
       USER_EMAIL: email,
       USER_PASSWORD: newPassword,

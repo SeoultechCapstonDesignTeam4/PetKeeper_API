@@ -28,22 +28,6 @@ async function deleteResetToken(email) {
   client.del(`reset:${email}`);
 }
 
-function getValueFromRedis(key) {
-  console.log('Fetching value from Redis for key:', key); // 로그 추가
-  return new Promise((resolve, reject) => {
-    client.get(key, (err, result) => {
-      if (err) {
-        console.error('Error fetching value:', err); // 로그 추가
-        reject(err);
-      } else {
-        console.log('Fetched value:', result); // 로그 추가
-        resolve(result);
-      }
-    });
-  });
-}
-
-
 async function verifyResetToken(email, token) {
   try {
     const value = await client.get(`reset:${email}`);
