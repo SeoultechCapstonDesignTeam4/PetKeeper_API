@@ -12,7 +12,6 @@ const {
   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL,
   KAKAO_CLIENT_ID, KAKAO_REDIRECT_URL,
   JWT_SECRET } = process.env;
-
 passport.use(new KakaoStrategy({
   clientID: KAKAO_CLIENT_ID,
   callbackURL: KAKAO_REDIRECT_URL,

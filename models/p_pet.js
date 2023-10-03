@@ -38,7 +38,7 @@ module.exports = function(sequelize, DataTypes) {
       comment: "애완동물 성별"
     },
     PET_BIRTHDATE: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.CHAR(40),
       allowNull: true,
       comment: "애완동물 출생일"
     },
