@@ -5,7 +5,9 @@ const {normalAuth, adminAuth} = require('./middle/jwt');
 let userImg = require('./middle/aws-s3').imageReq('user-profile');
 /* GET users listing. */
 router.get('/list', adminAuth, userController.getUsers);
-
+router.post('/forget/email', userController.forgetEmail);
+router.post('/forget/password', userController.forgetPassword);
+router.get('/forget/callback', userController.verifyToken);
 router.get('/logout', normalAuth, userController.logout);
 router.post('/login', userController.login);
 
@@ -19,10 +21,10 @@ router.delete('/user-img/:TARGET_USER_ID',
   normalAuth,
   userController.deleteUserImg
 );
+
 router.get('/:TARGET_USER_ID', normalAuth, userController.getUser);
 router.put('/:TARGET_USER_ID', normalAuth, userController.updateUser);
 router.delete('/:TARGET_USER_ID', normalAuth, userController.deleteUser);
-router.post('/forget', userController.forgetPassword);
-router.get('/forget/callback', userController.verifyToken);
+
 
 module.exports = router;

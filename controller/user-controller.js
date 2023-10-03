@@ -94,8 +94,27 @@ async function generateToken(user) {
   return token;
 }
 
+async function forgetEmail(req, res) {
+  const { USER_PHONE, USER_NAME } = req.body;
+  try {
+    if (!USER_NAME || !USER_PHONE) throw new Error('Name or phone is not found');
+    const user = await userService.getUserByPhone(USER_PHONE);
+    if(user.USER_NAME != USER_NAME){
+      throw new Error('Name does not match');
+    }
+    return res.status(200).json({
+      success: true,
+      message: 'User found',
+      USER_EMAIL: user.USER_EMAIL
+    }).end();
+  } catch (err) {
+    handleErrorResponse(err, res);
+  }
+}
+
 async function forgetPassword(req, res) {
   const { USER_EMAIL } = req.body;
+  console.log(req.body);
   try {
     if (!USER_EMAIL) throw new Error('Email is not found');
     const check = await userService.getUserByEmail(USER_EMAIL);
@@ -241,5 +260,6 @@ module.exports ={
   uploadUserImg,
   deleteUserImg,
   forgetPassword,
-  verifyToken
+  verifyToken,
+  forgetEmail
 }
