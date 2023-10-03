@@ -90,7 +90,7 @@ async function addPet(req,res){
     if(!pet){
       throw new Error('No pet');
     }
-    if (image) pet.POST_IMAGE = await uploadS3Image(image, dirName, USER_ID);
+    if (image) pet.PET_IMAGE = await uploadS3Image(image, dirName, USER_ID);
     const addedPet = await petService.addPet(pet,USER_ID);
     return res.status(200).json(addedPet).end();
   }catch(err){
