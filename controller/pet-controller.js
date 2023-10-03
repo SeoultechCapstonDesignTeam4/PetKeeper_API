@@ -27,7 +27,7 @@ async function getPets(req,res){
 
 async function deletePetImg(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  const {iPET_IDd} = req.params;
+  const {PET_ID} = req.params;
   try{
     const pet = await petService.getPetById(PET_ID);
     if(permissionCheck(USER_AUTH,USER_ID,pet.USER_ID)){
@@ -90,7 +90,7 @@ async function addPet(req,res){
     if(!pet){
       throw new Error('No pet');
     }
-    if (image) post.POST_IMAGE = await uploadS3Image(image, dirName, USER_ID);
+    if (image) pet.POST_IMAGE = await uploadS3Image(image, dirName, USER_ID);
     const addedPet = await petService.addPet(pet,USER_ID);
     return res.status(200).json(addedPet).end();
   }catch(err){
