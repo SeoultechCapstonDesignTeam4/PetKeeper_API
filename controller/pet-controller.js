@@ -71,6 +71,7 @@ async function uploadPetImg(req,res){
 }
 
 async function addPet(req,res){
+  const image = req.file;
   const {USER_ID} = res.locals.userInfo;
   let {PET_NAME, PET_KIND, PET_GENDER, PET_BIRDHDATE} = req.body;
   const pet = {
@@ -79,6 +80,7 @@ async function addPet(req,res){
     PET_GENDER: PET_GENDER,
     PET_BIRDHDATE: PET_BIRDHDATE
   }
+  console.log(pet);
 
   
   const now = getCurrentDate();
@@ -88,6 +90,7 @@ async function addPet(req,res){
     if(!pet){
       throw new Error('No pet');
     }
+    if (image) post.POST_IMAGE = await uploadS3Image(image, dirName, USER_ID);
     const addedPet = await petService.addPet(pet,USER_ID);
     return res.status(200).json(addedPet).end();
   }catch(err){
@@ -182,7 +185,11 @@ async function updatePetVaccination(req,res){
 
 async function addPetWeight(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  let weight = req.body;
+  const {PET_WEIGHT,PET_WEIGHT_DATE} = req.body;
+  const weight = {
+    PET_WEIGHT: PET_WEIGHT,
+    PET_WEIGHT_DATE: PET_WEIGHT_DATE
+  }
   const {PET_ID} = req.params;
   try{
     if(!weight){

@@ -66,7 +66,7 @@ router.get('/list', adminAuth, petController.getPets);
     }
  *}
  */
-router.post('/',normalAuth, petController.addPet);
+router.post('/',normalAuth, petImg.single('image'),petController.addPet);
 /**
  * @api {post} /pet/pet-img/:id upload Pet Image
  * @apiName uploadPetImg
@@ -144,7 +144,7 @@ router.get('/:PET_ID', normalAuth, petController.getPet);
  *    "PET_KIND": "진도"
  * }
  */
-router.put('/:PET_ID', normalAuth, petController.updatePet);
+router.put('/:PET_ID', normalAuth, petImg.single('image'),petController.updatePet);
 /**
  * @api {delete} /pet/:id delete Pet information
  * @apiName deletePet
