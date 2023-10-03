@@ -1,7 +1,7 @@
 const petService = require('../service/pet-service');
 const {uploadS3Img,deleteS3Img, uploadS3Image, deleteS3Image} = require('../util/s3-util');
 const {permissionCheck,handleErrorResponse, getCurrentDate} = require('../util/error');
-
+const { formatDateFromAndroid } = require('../util/date_phone');
 const dirName = 'pet-profile';
 
 async function getPet(req,res){
@@ -73,12 +73,13 @@ async function uploadPetImg(req,res){
 async function addPet(req,res){
   const image = req.file;
   const {USER_ID} = res.locals.userInfo;
-  let {PET_NAME, PET_KIND, PET_GENDER, PET_BIRDHDATE} = req.body;
+  const {PET_NAME, PET_KIND, PET_GENDER, PET_BIRDHDATE} = req.body;
+  
   const pet = {
-    PET_NAME: PET_NAME,
-    PET_KIND: PET_KIND,
-    PET_GENDER: PET_GENDER,
-    PET_BIRDHDATE: PET_BIRDHDATE
+    PET_NAME: PET_NAME?PET_NAME:null,
+    PET_KIND: PET_KIND?PET_KIND:null,
+    PET_GENDER: PET_GENDER?PET_GENDER:null,
+    PET_BIRDHDATE: PET_BIRDHDATE?formatDateFromAndroid(PET_BIRDHDATE):null,
   }
   console.log(pet);
 
@@ -187,13 +188,13 @@ async function addPetWeight(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const {PET_WEIGHT,PET_WEIGHT_DATE} = req.body;
   const weight = {
-    PET_WEIGHT: PET_WEIGHT,
-    PET_WEIGHT_DATE: PET_WEIGHT_DATE
+    PET_WEIGHT: PET_WEIGHT?PET_WEIGHT:null,
+    PET_WEIGHT_DATE: PET_WEIGHT_DATE?formatDateFromAndroid(PET_WEIGHT_DATE):null,
   }
   const {PET_ID} = req.params;
   try{
-    if(!weight){
-      throw new Error('No weight');
+    if(!PET_WEIGHT || !PET_WEIGHT_DATE){
+      throw new Error('No weight or weight date');
     }
     const petInfo = await petService.getPetById(PET_ID);
     if(permissionCheck(USER_AUTH,USER_ID,petInfo.USER_ID)){

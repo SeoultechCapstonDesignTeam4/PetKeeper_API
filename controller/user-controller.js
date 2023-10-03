@@ -6,6 +6,7 @@ const {handleErrorResponse,permissionCheck,getCurrentDate } = require('../util/e
 const {uploadS3Img,deleteS3Img} = require('../util/s3-util');
 const {sendEmail} = require('../util/mail-js');
 const {createResetToken,verifyResetToken,deleteResetToken, generateRandomString} = require('../util/redis');
+const {formatDateFromAndroid,formatPhoneNumber} = require('../util/date_phone');
 const dirName = 'user-profile';
 
 async function deleteUserImg(req, res) {
@@ -190,6 +191,7 @@ async function getUsers(req, res) {
 async function addUser(req, res) {
   const user = req.body;
   const now = getCurrentDate();
+  user.USER_PHONE = formatPhoneNumber(res,user.USER_PHONE);
   try {
     if (!user) {
       throw new Error('User data not found');
