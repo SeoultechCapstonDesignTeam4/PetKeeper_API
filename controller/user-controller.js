@@ -26,6 +26,7 @@ async function deleteUserImg(req, res) {
       return res.status(200).json({
         success: true,
         message: 'Delete success'
+        
       }).end();
     }
   } catch (err) {
@@ -114,15 +115,19 @@ async function forgetEmail(req, res) {
 }
 
 async function forgetPassword(req, res) {
-  const { USER_EMAIL } = req.body;
+  const { USER_EMAIL, USER_NAME,USER_PHONE } = req.body;
   console.log(req.body);
   try {
     if (!USER_EMAIL) throw new Error('Email is not found');
+    if (!USER_NAME || !USER_PHONE) throw new Error('Name or Phone is not found');
     const check = await userService.getUserByEmail(USER_EMAIL);
+    if (check.USER_NAME != USER_NAME || check.USER_PHONE != USER_PHONE) throw new Error('Name or Phone does not match');
+
     const data = {
       USER_ID: check.USER_ID,
       USER_EMAIL: check.USER_EMAIL
     };
+
     const token = await createResetToken(data);
     await sendEmail(USER_EMAIL, `[비밀번호 리셋]${USER_EMAIL}`, `https://petkeeper.co.kr/user/forget/callback?email=${USER_EMAIL}&token=${token}`);
     return res.status(200).json({ message: '비밀번호 리셋 이메일이 발송되었습니다. 내용에 나와있는 URL을 클릭해주세요' }).end();
@@ -153,8 +158,9 @@ async function verifyToken(req,res){
 }
 
 async function logout(req, res) {
-  const {USER_EMAIL} = res.locals.userInfo;
-  await p_user.update({ USER_ACCESSTOKEN: null }, { where: { USER_EMAIL: USER_EMAIL } });
+  const {USER_ID} = res.locals.userInfo;
+  await p_user.update({ USER_ACCESSTOKEN: null }, { where: { USER_ID: 
+  USER_ID } });
   res.setHeader('Authorization', null);
   return res.json({
     success: true,

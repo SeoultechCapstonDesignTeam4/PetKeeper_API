@@ -138,7 +138,14 @@ async function deletePet(req,res){
 
 async function addPetVaccination(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  let vaccination = req.body;
+
+  const {PET_VACCINATION_NAME, PET_VACCINATION_DATE, PET_VACCINATION_PERIOD} = req.body;
+  const vaccination = {
+    PET_VACCINATION_DATE: PET_VACCINATION_DATE?formatDateFromAndroid(PET_VACCINATION_DATE):null,
+    PET_VACCINATION_PERIOD: PET_VACCINATION_PERIOD?PET_VACCINATION_PERIOD:null,
+    PET_VACCINATION_NAME: PET_VACCINATION_NAME?PET_VACCINATION_NAME:null,
+  }
+
   const {PET_ID} = req.params;
   const now = getCurrentDate();
   vaccination.VACCINATION_DATE = now[0];
@@ -173,7 +180,12 @@ async function deletePetVaccination(req,res){
 
 async function updatePetVaccination(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  let vaccination = req.body;
+  const {PET_VACCINATION_NAME, PET_VACCINATION_DATE, PET_VACCINATION_PERIOD} = req.body;
+  const vaccination = {
+    PET_VACCINATION_DATE: PET_VACCINATION_DATE?formatDateFromAndroid(PET_VACCINATION_DATE):null,
+    PET_VACCINATION_PERIOD: PET_VACCINATION_PERIOD?PET_VACCINATION_PERIOD:null,
+    PET_VACCINATION_NAME: PET_VACCINATION_NAME?PET_VACCINATION_NAME:null,
+  }
   const {PET_VACCINATION_ID} = req.params;
   try{
     if(!vaccination){
@@ -193,8 +205,6 @@ async function updatePetVaccination(req,res){
 async function addPetWeight(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const {PET_WEIGHT,PET_WEIGHT_DATE} = req.body;
-  console.log(PET_WEIGHT,PET_WEIGHT_DATE);
-  console.log(USER_AUTH, USER_ID)
   const weight = {
     PET_WEIGHT: PET_WEIGHT?PET_WEIGHT:null,
     PET_WEIGHT_DATE: PET_WEIGHT_DATE?formatDateFromAndroid(PET_WEIGHT_DATE):null,
@@ -233,7 +243,11 @@ async function deletePetWeight(req,res){
 
 async function updatePetWeight(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
-  let weight = req.body;
+  const {PET_WEIGHT,PET_WEIGHT_DATE} = req.body;
+  const weight = {
+    PET_WEIGHT: PET_WEIGHT?PET_WEIGHT:null,
+    PET_WEIGHT_DATE: PET_WEIGHT_DATE?formatDateFromAndroid(PET_WEIGHT_DATE):null,
+  }
   const {PET_WEIGHT_ID} = req.params;
   try{
     if(!weight){
