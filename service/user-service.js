@@ -159,12 +159,12 @@ async function getUserByPhone(phone) {
 async function getUserByToken(token) {
   const user = await p_user.findOne({
     attributes: {
-      exclude: ['USER_PASSWORD', 'USER_ACCESSTOKEN', 'IS_DELETED', 'createdAt', 'updatedAt']
+      exclude: ['USER_PASSWORD', 'IS_DELETED']
     },
     where: { USER_ACCESSTOKEN: token },
     include: {
       model: p_pet,
-      attributes: { exclude: ['createdAt', 'updatedAt', 'IS_DELETED'] },
+      attributes: { exclude: ['IS_DELETED'] },
       as: 'p_pets',
       required: false,
     }

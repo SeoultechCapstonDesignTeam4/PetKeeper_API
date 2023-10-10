@@ -29,6 +29,7 @@ async function adminAuth(req,res,next){
 
 async function normalAuth(req,res,next){
   let userToken = req.headers['authorization'];
+  console.log(userToken);
   if(!userToken){
     return res.status(403).json({
       success: false,
@@ -46,6 +47,7 @@ async function normalAuth(req,res,next){
       throw new Error('not even user');
     }
   }catch(err){
+    console.log(err);
     return res.status(403).json({
       success: false,
       message: err.message

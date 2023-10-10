@@ -69,11 +69,11 @@ async function login(req, res) {
 
     if (isPasswordMatch) {
       const token = await generateToken(user);
-
+      const userInformation = await userService.getUserById(user.USER_ID);
       await p_user.update({ USER_ACCESSTOKEN: token }, { where: { USER_EMAIL: user.USER_EMAIL } });
 
       res.setHeader('Authorization', `Bearer ${token}`);
-      return res.status(200).json({ token }).end();
+      return res.status(200).json({ token:token, USER: userInformation }).end();
     } else {
       throw new Error('Password does not match');
     }
@@ -224,8 +224,12 @@ async function updateUser(req, res) {
     if (permissionCheck(USER_AUTH, USER_ID, TARGET_USER_ID)) {
       user.USER_PASSWORD = bcrypt.hashSync(user.USER_PASSWORD, 10);
       const data = await userService.updateUser(user,TARGET_USER_ID);
+      const userInformation = await userService.getUserById(TARGET_USER_ID);
       data.USER_PASSWORD = '********';
-      return res.status(200).json(data).end();
+      return res.status(200).json({
+        token:userInformation.USER_ACCESSTOKEN,
+        USER:userInformation
+      }).end();
     } else {
       throw new Error('Permission denied');
     }

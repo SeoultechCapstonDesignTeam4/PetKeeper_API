@@ -3,6 +3,7 @@ const {uploadS3Img,deleteS3Img, uploadS3Image, deleteS3Image} = require('../util
 const {permissionCheck,handleErrorResponse, getCurrentDate} = require('../util/error');
 const { formatDateFromAndroid } = require('../util/date_phone');
 const dirName = 'pet-profile';
+const userService = require('../service/user-service');
 
 async function getPet(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
@@ -72,7 +73,7 @@ async function uploadPetImg(req,res){
 
 async function addPet(req,res){
   const image = req.file;
-  const {USER_ID} = res.locals.userInfo;
+  const {USER_ID,USER_ACCESSTOKEN} = res.locals.userInfo;
   const {PET_NAME, PET_KIND, PET_GENDER, PET_BIRDHDATE} = req.body;
   
   const pet = {
@@ -81,9 +82,6 @@ async function addPet(req,res){
     PET_GENDER: PET_GENDER?PET_GENDER:null,
     PET_BIRDHDATE: PET_BIRDHDATE?formatDateFromAndroid(PET_BIRDHDATE):null,
   }
-  console.log(pet);
-
-  
   const now = getCurrentDate();
   pet.PET_DATE = now[0];
   pet.PET_TIME = now[1];
@@ -93,14 +91,18 @@ async function addPet(req,res){
     }
     if (image) pet.PET_IMAGE = await uploadS3Image(image, dirName, USER_ID);
     const addedPet = await petService.addPet(pet,USER_ID);
-    return res.status(200).json(addedPet).end();
+    const userInformation = await userService.getUserById(USER_ID);
+    return res.status(200).json({
+      token:USER_ACCESSTOKEN,
+      USER:userInformation
+    }).end();
   }catch(err){
     handleErrorResponse(err, res);
   }
 }
 
 async function updatePet(req,res){
-  const {USER_AUTH, USER_ID} = res.locals.userInfo;
+  const {USER_AUTH, USER_ID,USER_ACCESSTOKEN} = res.locals.userInfo;
   let pet = req.body;
   const {PET_ID} = req.params;
   try{
@@ -109,8 +111,12 @@ async function updatePet(req,res){
     }
     const petInfo = await petService.getPetById(PET_ID);
     if(permissionCheck(USER_AUTH,USER_ID,petInfo.USER_ID)){
-      const data = await petService.updatePet(pet,PET_ID);
-      return res.status(200).json(pet).end();
+      await petService.updatePet(pet,PET_ID);
+      const userInformation = await userService.getUserById(USER_ID);
+      return res.status(200).json({
+        token:USER_ACCESSTOKEN,
+        USER:userInformation
+      }).end();
     }
   }catch(err){
     handleErrorResponse(err, res);
@@ -187,12 +193,16 @@ async function updatePetVaccination(req,res){
 async function addPetWeight(req,res){
   const {USER_AUTH, USER_ID} = res.locals.userInfo;
   const {PET_WEIGHT,PET_WEIGHT_DATE} = req.body;
+  console.log(PET_WEIGHT,PET_WEIGHT_DATE);
+  console.log(USER_AUTH, USER_ID)
   const weight = {
     PET_WEIGHT: PET_WEIGHT?PET_WEIGHT:null,
     PET_WEIGHT_DATE: PET_WEIGHT_DATE?formatDateFromAndroid(PET_WEIGHT_DATE):null,
   }
+  console.log(weight);
   const {PET_ID} = req.params;
   try{
+    
     if(!PET_WEIGHT || !PET_WEIGHT_DATE){
       throw new Error('No weight or weight date');
     }
