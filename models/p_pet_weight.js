@@ -20,7 +20,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     PET_WEIGHT_DATE: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.CHAR(40),
       allowNull: true
     },
     PET_WEIGHT_TIME: {

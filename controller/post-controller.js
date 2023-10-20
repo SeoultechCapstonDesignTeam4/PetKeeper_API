@@ -6,8 +6,8 @@ const dirName = 'post-photo';
 
 async function getPosts(req,res){
   try{
-    const data = await postService.getPosts()
-    return res.status(200).json(data).end();;
+    const data = await postService.getPosts();
+    return res.status(200).json({data}).end();
   }catch(err){
     handleErrorResponse(err, res);
   }
@@ -43,6 +43,7 @@ async function getPostsByUserId(req,res){
 async function addPost(req, res) {
   const image = req.file;
   const { USER_ID } = res.locals.userInfo;
+  
   let post = req.body;
   const now = getCurrentDate();
   post.POST_DATE = now[0];

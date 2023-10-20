@@ -15,10 +15,6 @@ module.exports = function(sequelize, DataTypes) {
         key: 'USER_ID'
       }
     },
-    POST_TITLE: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
     POST_CONTENT: {
       type: DataTypes.TEXT,
       allowNull: true

@@ -9,18 +9,42 @@ async function getPosts() {
       {
         model: p_user,
         as: 'USER',
-      },{
-        model: p_post_photo,
-        as: 'p_post_photos',
-      },{
+        attributes: ['USER_IMAGE', 'USER_EMAIL'],
+      },
+      {
         model: p_post_like,
         as: 'p_post_likes',
-      },{
+        attributes: ['LIKE_ID','USER_ID'],
+        include:{
+          model: p_user,
+          as: 'USER',
+          attributes: ['USER_NAME','USER_IMAGE']
+        }
+      },
+      {
         model: p_post_comment,
         as: 'p_post_comments',
-      }
-    ]
+        attributes: {
+          exclude: ['POST_ID']
+        },
+        include:{
+          model: p_user,
+          as: 'USER',
+          attributes: ['USER_NAME','USER_IMAGE']
+        },
+        order:[
+          ['COMMENT_DATE', 'ASC'],   // 오름차순 정렬
+          ['COMMENT_TIME', 'ASC'],   // 오름차순 정렬
+        ]
+      },
+    ],
+    order: [
+      ['POST_DATE', 'DESC'],   // 오름차순 정렬
+      ['POST_TIME', 'DESC'],   // 오름차순 정렬
+    ],
+    // raw: true, // raw 데이터로 결과 반환
   });
+  
   if (!posts.length) {
     throw new Error('Posts not found');
   }
@@ -157,6 +181,17 @@ async function getLikesByUserId(USER_ID) {
   return likes;
 }
 async function addLike(POST_ID,USER_ID){
+  const check = await p_post_like.findOne({
+    where: {
+      [Op.and]: [
+        { POST_ID: POST_ID },
+        { USER_ID: USER_ID },
+      ]
+    }
+  })
+  if(check){
+    throw new Error('Already liked');
+  }
   const info ={
     POST_ID: POST_ID,
     USER_ID: USER_ID,
@@ -193,6 +228,8 @@ async function deleteLike(POST_ID,USER_ID) {
 
 async function addPostPhoto(photo,USER_ID) {
   photo.USER_ID = USER_ID;
+  const url = `https://${process.env.s3_bucket}.s3.${process.env.s3_region}.amazonaws.com/post-photo/${photo.PHOTO_PATH}`;
+  photo.PHOTO_PATH = url;
   const createdPhoto = await p_post_photo.create(photo);
   if (!createdPhoto) {
     throw new Error('Photo not created');
