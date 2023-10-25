@@ -3,8 +3,7 @@ let initModels = require('../models/init-models');
 let {p_user,p_post,p_post_comment,p_post_like,p_post_photo} = initModels(sequelize);
 const { Op } = require('sequelize');
 
-async function getPosts(pageNum,item) {
-  const tmp = pageNum * item;
+async function getPosts() {
   const posts = await p_post.findAll({
     include: [
       {
@@ -43,8 +42,6 @@ async function getPosts(pageNum,item) {
       ['POST_DATE', 'DESC'],   // 오름차순 정렬
       ['POST_TIME', 'DESC'],   // 오름차순 정렬
     ],
-    limit: {item},
-    offset: {tmp}
     // raw: true, // raw 데이터로 결과 반환
   });
   
