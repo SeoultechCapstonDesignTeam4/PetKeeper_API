@@ -27,11 +27,6 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       comment: "애완동물 종류(강아지 고양이)"
     },
-    PET_SPECIES: {
-      type: DataTypes.CHAR(50),
-      allowNull: true,
-      comment: "애완동물 종"
-    },
     PET_GENDER: {
       type: DataTypes.CHAR(20),
       allowNull: true,

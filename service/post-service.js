@@ -3,8 +3,60 @@ let initModels = require('../models/init-models');
 let {p_user,p_post,p_post_comment,p_post_like,p_post_photo} = initModels(sequelize);
 const { Op } = require('sequelize');
 
-async function getPosts() {
+async function getPosts(pageNum,item) {
+  const tmp = pageNum * item;
   const posts = await p_post.findAll({
+    include: [
+      {
+        model: p_user,
+        as: 'USER',
+        attributes: ['USER_IMAGE', 'USER_EMAIL'],
+      },
+      {
+        model: p_post_like,
+        as: 'p_post_likes',
+        attributes: ['LIKE_ID','USER_ID'],
+        include:{
+          model: p_user,
+          as: 'USER',
+          attributes: ['USER_NAME','USER_IMAGE']
+        }
+      },
+      {
+        model: p_post_comment,
+        as: 'p_post_comments',
+        attributes: {
+          exclude: ['POST_ID']
+        },
+        include:{
+          model: p_user,
+          as: 'USER',
+          attributes: ['USER_NAME','USER_IMAGE']
+        },
+        order:[
+          ['COMMENT_DATE', 'ASC'],   // 오름차순 정렬
+          ['COMMENT_TIME', 'ASC'],   // 오름차순 정렬
+        ]
+      },
+    ],
+    order: [
+      ['POST_DATE', 'DESC'],   // 오름차순 정렬
+      ['POST_TIME', 'DESC'],   // 오름차순 정렬
+    ],
+    limit: {item},
+    offset: {tmp}
+    // raw: true, // raw 데이터로 결과 반환
+  });
+  
+  if (!posts.length) {
+    throw new Error('Posts not found');
+  }
+  return posts;
+}
+
+async function getPostsByUserId(USER_ID){
+  const posts = await p_post.findAll({
+    where: { USER_ID: USER_ID },
     include: [
       {
         model: p_user,
@@ -44,53 +96,45 @@ async function getPosts() {
     ],
     // raw: true, // raw 데이터로 결과 반환
   });
-  
-  if (!posts.length) {
-    throw new Error('Posts not found');
-  }
-  return posts;
-}
-
-async function getPostsByUserId(USER_ID){
-  const posts = await p_post.findAll({
-    where: {USER_ID: USER_ID},
-    include: [{
-        model: p_user,
-        as: 'USER',
-        attributes: ['USER_NAME','USER_IMAGE']
-      },{
-        model: p_post_photo,
-        as: 'p_post_photos',
-      },{
-        model: p_post_like,
-        as: 'p_post_likes',
-      },{
-        model: p_post_comment,
-        as: 'p_post_comments',
-      }
-    ]
-  });
   return posts;
 }
 
 async function getPostById(POST_ID) {
   const post = await p_post.findOne({
     where: { POST_ID: POST_ID },
-    include: [{
-      model: p_user,
-      as: 'USER',
-      attributes: ['USER_NAME','USER_IMAGE']
-    },{
-      model: p_post_photo,
-      as: 'p_post_photos',
-    },{
-      model: p_post_like,
-      as: 'p_post_likes',
-    },{
-      model: p_post_comment,
-      as: 'p_post_comments',
-    }
-  ]
+    include: [
+      {
+        model: p_user,
+        as: 'USER',
+        attributes: ['USER_IMAGE', 'USER_EMAIL'],
+      },
+      {
+        model: p_post_like,
+        as: 'p_post_likes',
+        attributes: ['LIKE_ID','USER_ID'],
+        include:{
+          model: p_user,
+          as: 'USER',
+          attributes: ['USER_NAME','USER_IMAGE']
+        }
+      },
+      {
+        model: p_post_comment,
+        as: 'p_post_comments',
+        attributes: {
+          exclude: ['POST_ID']
+        },
+        include:{
+          model: p_user,
+          as: 'USER',
+          attributes: ['USER_NAME','USER_IMAGE']
+        },
+        order:[
+          ['COMMENT_DATE', 'ASC'],   // 오름차순 정렬
+          ['COMMENT_TIME', 'ASC'],   // 오름차순 정렬
+        ]
+      },
+    ],
   });
   
   if (!post) {

@@ -1,6 +1,6 @@
 const sequelize = require('../models').sequelize;
 let initModels = require('../models/init-models');
-let {p_pet,p_user,p_pet_vaccination,p_pet_weight} = initModels(sequelize);
+let {p_pet,p_user,p_pet_vaccination,p_pet_weight,p_pet_eye} = initModels(sequelize);
 const { Op } = require('sequelize');
 async function getUsers() {
   const users = await p_user.findAll({
@@ -16,9 +16,16 @@ async function getUsers() {
         {
           model: p_pet_vaccination,
           as: 'p_pet_vaccinations',
+          attributes: { exclude: ['PET_ID'] },
         },{
           model: p_pet_weight,
           as: 'p_pet_weights',
+          attributes: { exclude: ['PET_ID'] },
+        },
+        {
+          model: p_pet_eye,
+          as: 'p_pet_eyes',
+          attributes: { exclude: ['PET_ID','USER_ID'] },
         }
       ],
       attributes: { exclude: ['createdAt', 'updatedAt', 'IS_DELETED'] }
@@ -66,7 +73,7 @@ async function uploadUserImg(USER_ID, key) {
 async function getUserById(id) {
   const user = await p_user.findOne({
     attributes: {
-      exclude: ['USER_PASSWORD', 'USER_ACCESSTOKEN', 'IS_DELETED', 'createdAt', 'updatedAt']
+      exclude: ['USER_AUTH','USER_PASSWORD', 'USER_ACCESSTOKEN', 'IS_DELETED', 'createdAt', 'updatedAt']
     },
     where: { USER_ID: id },
     include: {
@@ -78,9 +85,16 @@ async function getUserById(id) {
         {
           model: p_pet_vaccination,
           as: 'p_pet_vaccinations',
+          attributes: { exclude: ['PET_ID'] },
         },{
           model: p_pet_weight,
           as: 'p_pet_weights',
+          attributes: { exclude: ['PET_ID'] },
+        },
+        {
+          model: p_pet_eye,
+          as: 'p_pet_eyes',
+          attributes: { exclude: ['PET_ID','USER_ID'] },
         }
       ],
       attributes: { exclude: ['createdAt', 'updatedAt', 'IS_DELETED'] }

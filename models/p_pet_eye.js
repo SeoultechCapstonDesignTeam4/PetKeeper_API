@@ -23,19 +23,47 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.CHAR(20),
       allowNull: true
     },
+    EYE_NORMAL: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      comment: "정상"
+    },
     EYE_CONJUNCTIVITIS: {
       type: DataTypes.FLOAT,
-      allowNull: true
+      allowNull: true,
+      comment: "결막염"
+    },
+    EYE_CATARACT: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      comment: "백내장"
+    },
+    EYE_GALACTORRHEA: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      comment: "유루증"
+    },
+    EYE_PIGMENTED_KERATITIS: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      comment: "색소침착성 각막염"
     },
     EYE_IMAGE: {
       type: DataTypes.CHAR(255),
+      allowNull: true
+    },
+    EYE_DATE: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+    EYE_TIME: {
+      type: DataTypes.TIME,
       allowNull: true
     }
   }, {
     sequelize,
     tableName: 'p_pet_eye',
-    timestamps: true,
-    paranoid: true,
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",

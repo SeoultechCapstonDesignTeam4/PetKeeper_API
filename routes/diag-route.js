@@ -33,7 +33,7 @@ router.get('/', (req, res) => {
   });
 });
 
-router.post('/eye', normalAuth,
+router.post('/eye/:PET_ID', normalAuth,
   uploader.single('image'),diagController.eye);
 
 
