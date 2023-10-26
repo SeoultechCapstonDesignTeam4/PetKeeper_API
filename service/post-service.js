@@ -1,6 +1,6 @@
 const sequelize = require('../models').sequelize;
 let initModels = require('../models/init-models');
-let {p_user,p_post,p_post_comment,p_post_like,p_post_photo} = initModels(sequelize);
+let {p_user,p_post,p_pet,p_post_comment,p_post_like,p_post_photo} = initModels(sequelize);
 const { Op } = require('sequelize');
 
 async function getPosts() {
@@ -10,6 +10,11 @@ async function getPosts() {
         model: p_user,
         as: 'USER',
         attributes: ['USER_IMAGE', 'USER_EMAIL'],
+        include:{
+          model: p_pet,
+          as: 'p_pets',
+          attributes: ['PET_ID','PET_NAME','PET_IMAGE'],
+        }
       },
       {
         model: p_post_like,
