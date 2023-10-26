@@ -74,13 +74,13 @@ async function uploadPetImg(req,res){
 async function addPet(req,res){
   const image = req.file;
   const {USER_ID,USER_ACCESSTOKEN} = res.locals.userInfo;
-  const {PET_NAME, PET_KIND, PET_GENDER, PET_BIRDHDATE} = req.body;
+  const {PET_NAME, PET_KIND, PET_GENDER, PET_BIRTHDATE} = req.body;
   
   const pet = {
     PET_NAME: PET_NAME?PET_NAME:null,
     PET_KIND: PET_KIND?PET_KIND:null,
     PET_GENDER: PET_GENDER?PET_GENDER:null,
-    PET_BIRDHDATE: PET_BIRDHDATE?formatDateFromAndroid(PET_BIRDHDATE):null,
+    PET_BIRTHDATE: PET_BIRTHDATE?formatDateFromAndroid(PET_BIRTHDATE):null,
   }
   const now = getCurrentDate();
   pet.PET_DATE = now[0];
