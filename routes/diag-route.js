@@ -32,6 +32,8 @@ router.get('/', (req, res) => {
     return res.status(404).json(error);
   });
 });
+router.post('/eye/', normalAuth,
+  uploader.single('image'),diagController.eye);
 
 router.post('/eye/:PET_ID', normalAuth,
   uploader.single('image'),diagController.eye);

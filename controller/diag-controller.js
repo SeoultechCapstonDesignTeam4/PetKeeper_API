@@ -23,8 +23,11 @@ const diagnosisMapping = {
 async function eye(req,res){
   const image = req.file;
   const imagePath = image.path;
-  const { USER_ID } = res.locals.userInfo;
-  const {PET_ID} = req.params;
+  const { USER_ID,p_pets } = res.locals.userInfo;
+  let {PET_ID} = req.params;
+  if (!PET_ID){
+    PET_ID = p_pets[0].PET_ID;
+  }
   const key = 'eye-image/' + `${USER_ID}_${Date.now()}`
   const url = 'https://'+process.env.s3_bucket+'.s3.'+process.env.s3_region+'.amazonaws.com/'+key;
   const form = new FormData();
