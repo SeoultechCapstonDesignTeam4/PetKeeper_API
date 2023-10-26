@@ -103,12 +103,17 @@ async function addPet(req,res){
 
 async function updatePet(req,res){
   const {USER_AUTH, USER_ID,USER_ACCESSTOKEN} = res.locals.userInfo;
-  let pet = req.body;
   const {PET_ID} = req.params;
+  
+  let pet = req.body;
+  
+
   try{
     if(!pet){
       throw new Error('No pet');
     }
+    const image = req.file;
+    if (image) pet.PET_IMAGE = await uploadS3Image(image, dirName, USER_ID);
     const petInfo = await petService.getPetById(PET_ID);
     if(permissionCheck(USER_AUTH,USER_ID,petInfo.USER_ID)){
       await petService.updatePet(pet,PET_ID);
