@@ -105,8 +105,8 @@ async function updatePet(req,res){
   const {USER_AUTH, USER_ID,USER_ACCESSTOKEN} = res.locals.userInfo;
   const {PET_ID} = req.params;
   
-  let pet = req.body;
-  
+  let {pet} = req.body;
+  console.log(pet);
 
   try{
     if(!pet){
