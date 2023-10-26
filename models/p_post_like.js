@@ -10,6 +10,7 @@ module.exports = function(sequelize, DataTypes) {
     POST_ID: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
+      comment: "좋아요 된 게시글",
       references: {
         model: 'p_post',
         key: 'POST_ID'
@@ -18,6 +19,7 @@ module.exports = function(sequelize, DataTypes) {
     USER_ID: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
+      comment: "좋아요 한 사람",
       references: {
         model: 'p_user',
         key: 'USER_ID'

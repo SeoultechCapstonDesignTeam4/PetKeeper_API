@@ -10,6 +10,7 @@ module.exports = function(sequelize, DataTypes) {
     PET_ID: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
+      comment: "펫번호",
       references: {
         model: 'p_pet',
         key: 'PET_ID'
@@ -17,19 +18,23 @@ module.exports = function(sequelize, DataTypes) {
     },
     PET_VACCINATION_NAME: {
       type: DataTypes.CHAR(40),
-      allowNull: true
+      allowNull: true,
+      comment: "백신이름"
     },
     PET_VACCINATION_PERIOD: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: true,
+      comment: "백신유효기간"
     },
     PET_VACCINATION_DATE: {
       type: DataTypes.DATEONLY,
-      allowNull: true
+      allowNull: true,
+      comment: "백신투약일"
     },
     PET_VACCINATION_TIME: {
       type: DataTypes.TIME,
-      allowNull: true
+      allowNull: true,
+      comment: "백신투약시간"
     }
   }, {
     sequelize,

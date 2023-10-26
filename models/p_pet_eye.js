@@ -9,11 +9,13 @@ module.exports = function(sequelize, DataTypes) {
     },
     USER_ID: {
       type: DataTypes.BIGINT.UNSIGNED,
-      allowNull: true
+      allowNull: true,
+      comment: "유저번호"
     },
     PET_ID: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
+      comment: "펫번호",
       references: {
         model: 'p_pet',
         key: 'PET_ID'
@@ -21,7 +23,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     EYE_STATE: {
       type: DataTypes.CHAR(20),
-      allowNull: true
+      allowNull: true,
+      comment: "상태"
     },
     EYE_NORMAL: {
       type: DataTypes.FLOAT,
@@ -50,7 +53,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     EYE_IMAGE: {
       type: DataTypes.CHAR(255),
-      allowNull: true
+      allowNull: true,
+      comment: "이미지링크"
     },
     EYE_DATE: {
       type: DataTypes.DATEONLY,

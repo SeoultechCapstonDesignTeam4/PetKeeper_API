@@ -5,11 +5,13 @@ module.exports = function(sequelize, DataTypes) {
       autoIncrement: true,
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
+      comment: "글 번호"
     },
     USER_ID: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
+      comment: "작성자 번호",
       references: {
         model: 'p_user',
         key: 'USER_ID'
@@ -17,19 +19,23 @@ module.exports = function(sequelize, DataTypes) {
     },
     POST_CONTENT: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: true,
+      comment: "글 내용"
     },
     POST_IMAGE: {
       type: DataTypes.CHAR(255),
-      allowNull: true
+      allowNull: true,
+      comment: "글 이미지URL"
     },
     POST_DATE: {
       type: DataTypes.DATEONLY,
-      allowNull: true
+      allowNull: true,
+      comment: "글 작성일"
     },
     POST_TIME: {
       type: DataTypes.TIME,
-      allowNull: true
+      allowNull: true,
+      comment: "글 작성시간"
     }
   }, {
     sequelize,

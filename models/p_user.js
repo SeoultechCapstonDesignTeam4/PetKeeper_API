@@ -10,7 +10,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     USER_OAUTH_ID: {
       type: DataTypes.CHAR(200),
-      allowNull: true
+      allowNull: true,
+      comment: "OAUTH 고유번호"
     },
     USER_EMAIL: {
       type: DataTypes.CHAR(30),
@@ -56,11 +57,13 @@ module.exports = function(sequelize, DataTypes) {
     },
     USER_DATE: {
       type: DataTypes.DATEONLY,
-      allowNull: true
+      allowNull: true,
+      comment: "사용자 생성일"
     },
     USER_TIME: {
       type: DataTypes.TIME,
-      allowNull: true
+      allowNull: true,
+      comment: "사용자 생성시각"
     },
     IS_DELETED: {
       type: DataTypes.BOOLEAN,
@@ -69,12 +72,14 @@ module.exports = function(sequelize, DataTypes) {
     },
     USER_OAUTH_PROVIDER: {
       type: DataTypes.CHAR(20),
-      allowNull: true
+      allowNull: true,
+      comment: "OAUTH 제공처"
     },
     USER_EMAIL_VERIFIED: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
-      defaultValue: 0
+      defaultValue: 0,
+      comment: "이메일 인증여부"
     }
   }, {
     sequelize,

@@ -45,11 +45,13 @@ module.exports = function(sequelize, DataTypes) {
     },
     PET_DATE: {
       type: DataTypes.DATEONLY,
-      allowNull: true
+      allowNull: true,
+      comment: "펫 등록일"
     },
     PET_TIME: {
       type: DataTypes.TIME,
-      allowNull: true
+      allowNull: true,
+      comment: "펫 등록시간"
     },
     IS_DELETED: {
       type: DataTypes.TINYINT,

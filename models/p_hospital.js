@@ -9,23 +9,28 @@ module.exports = function(sequelize, DataTypes) {
     },
     HOSPITAL_NAME: {
       type: DataTypes.CHAR(40),
-      allowNull: true
+      allowNull: true,
+      comment: "병원이름"
     },
     HOSPITAL_PHONE: {
       type: DataTypes.CHAR(20),
-      allowNull: true
+      allowNull: true,
+      comment: "병원전화번호"
     },
     HOSPITAL_ADDRESS: {
       type: DataTypes.CHAR(40),
-      allowNull: true
+      allowNull: true,
+      comment: "병원주소"
     },
     HOSPITAL_X: {
       type: DataTypes.DOUBLE,
-      allowNull: true
+      allowNull: true,
+      comment: "X"
     },
     HOSPITAL_Y: {
       type: DataTypes.DOUBLE,
-      allowNull: true
+      allowNull: true,
+      comment: "Y"
     }
   }, {
     sequelize,

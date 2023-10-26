@@ -10,6 +10,7 @@ module.exports = function(sequelize, DataTypes) {
     USER_ID: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
+      comment: "댓글 작성자",
       references: {
         model: 'p_user',
         key: 'USER_ID'
@@ -18,6 +19,7 @@ module.exports = function(sequelize, DataTypes) {
     POST_ID: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: true,
+      comment: "댓글 작성된 글",
       references: {
         model: 'p_post',
         key: 'POST_ID'
@@ -25,15 +27,18 @@ module.exports = function(sequelize, DataTypes) {
     },
     COMMENT_TEXT: {
       type: DataTypes.CHAR(200),
-      allowNull: true
+      allowNull: true,
+      comment: "댓글 내용"
     },
     COMMENT_DATE: {
       type: DataTypes.DATEONLY,
-      allowNull: true
+      allowNull: true,
+      comment: "댓글 작성일"
     },
     COMMENT_TIME: {
       type: DataTypes.TIME,
-      allowNull: true
+      allowNull: true,
+      comment: "댓글 작성시각"
     }
   }, {
     sequelize,
