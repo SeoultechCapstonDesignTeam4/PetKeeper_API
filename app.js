@@ -14,6 +14,7 @@ const diagRouter = require('./routes/diag-route');
 const postRouter = require('./routes/post-route');
 const oauthRouter = require('./routes/oauth-route');
 const verifyRouter = require('./routes/verify-route');
+const adminRouter = require('./routes/admin-route');
 // const app = express();
 const sequelize = require('./models');
 // Express 애플리케이션을 초기화합니다.
@@ -37,7 +38,7 @@ app.use('/diag', diagRouter);
 app.use('/post', postRouter);
 app.use('/auth', oauthRouter);
 app.use('/verify', verifyRouter);
-
+app.use('/admin', adminRouter);
 const rateLimit = require("express-rate-limit");
 // 앱 또는 라우터 레벨에서 제한 설정
 const limiter = rateLimit({

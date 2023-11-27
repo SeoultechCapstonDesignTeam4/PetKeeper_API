@@ -1,0 +1,9 @@
+<%-include('../index/header.ejs') %>
+<body>
+    <%= data.length%>
+    <% for(let i = 0; i < data.length; i++){ %>
+        <%= data[i].USER_EMAIL%>
+        <br>
+    <%}%>
+</body>
+<%-include('../index/footer.ejs') %>
